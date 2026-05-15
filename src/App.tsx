@@ -354,7 +354,12 @@ const TopNav = () => {
         <div className="w-full max-w-[65rem] relative">
           <GlassSurface borderRadius={9999} className="w-full rounded-full border border-white/10 hover:border-white/20 transition-all bg-[#0e1014]/40 shadow-2xl" contentClassName="flex items-center justify-between px-4 sm:px-6 py-3 w-full">
             <div className="flex items-center gap-3">
-              <LogoMark className="w-6 h-6" />
+              <img
+                src="/images/logo-main.svg"
+                alt="ECHO SYSTEMS"
+                className="w-6 h-6 object-contain"
+                loading="eager"
+              />
               <span className="font-bold tracking-widest text-sm hidden sm:block">ECHO SYSTEMS</span>
             </div>
             <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-[10px] lg:text-xs font-bold tracking-widest uppercase opacity-70">
@@ -622,7 +627,7 @@ const SystemViewer = () => {
       name: t('conc_name'),
       short: t('conc_short'),
       targetId: 'A',
-      image: "https://images.unsplash.com/photo-1541888087588-ac041c2c2f48?auto=format&fit=crop&q=80&w=600",
+      image: "/images/sys-concrete.webp",
       material: t('conc_mat'),
       desc: t('conc_desc'),
       grade: 'L4/B-Grade',
@@ -634,7 +639,7 @@ const SystemViewer = () => {
       name: t('steel_name'),
       short: t('steel_short'),
       targetId: 'B',
-      image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=600",
+      image: "/images/sys-steel.webp",
       material: t('steel_mat'),
       desc: t('steel_desc'),
       grade: 'L3/Rapid',
@@ -646,7 +651,7 @@ const SystemViewer = () => {
       name: t('pipe_name'),
       short: t('pipe_short'),
       targetId: 'C',
-      image: "https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?auto=format&fit=crop&q=80&w=600",
+      image: "/images/sys-pipes.webp",
       material: t('pipe_mat'),
       desc: t('pipe_desc'),
       grade: 'Urban',
@@ -707,7 +712,14 @@ const SystemViewer = () => {
               <div className="liquid-glass p-8 min-h-[220px] rounded-2xl border border-white/5 bg-white/[0.02]">
                 <div className="flex flex-col sm:flex-row gap-6 mb-6">
                   {activeSystem.image && (
-                    <img src={activeSystem.image} alt={activeSystem.name} className="w-full sm:w-32 h-32 rounded-xl object-cover border border-white/10 shadow-lg object-center" />
+                    <div className="w-full sm:w-32 h-32 rounded-xl overflow-hidden border border-white/10 shadow-lg shrink-0 bg-white">
+                      <img
+                        src={activeSystem.image}
+                        alt={activeSystem.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover object-center"
+                      />
+                    </div>
                   )}
                   <div className="flex-1">
                     <div className="text-[10px] uppercase tracking-widest opacity-40 mb-3">{activeSystem.isAbout ? t('corp_over') : t('sys_det')}</div>
@@ -988,7 +1000,7 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_a1_s'),
           desc: t('step_a1_d'),
-          image: "https://images.unsplash.com/photo-1541888087588-ac041c2c2f48?auto=format&fit=crop&q=80&w=1600",
+          image: "/images/series-a-1.webp",
           specs: [
             { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_p2050') },
             { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_u1u2') },
@@ -999,7 +1011,7 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_a2_s'),
           desc: t('step_a2_d'),
-          image: "https://images.unsplash.com/photo-1506526615599-4d642b58ea0b?auto=format&fit=crop&q=80&w=1600",
+          image: "/images/series-a-2.webp",
           specs: [
             { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_p412') },
             { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_h48') },
@@ -1010,7 +1022,7 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_a3_s'),
           desc: t('step_a3_d'),
-          image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&q=80&w=1600",
+          image: "/images/series-a-3.webp",
           specs: [
             { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t100') },
             { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_s3') },
@@ -1041,7 +1053,7 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_b1_s'),
           desc: t('step_b1_d'),
-          image: "https://images.unsplash.com/photo-1541888087588-ac041c2c2f48?auto=format&fit=crop&q=80&w=1600",
+          image: "/images/series-b-1.webp",
           specs: [
             { icon: <Clock className="w-4 h-4"/>, label: t('spec_asm'), value: t('val_w12') },
             { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t15') },
@@ -1052,7 +1064,7 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_b2_s'),
           desc: t('step_b2_d'),
-          image: "https://images.unsplash.com/photo-1582298651877-c33580436814?auto=format&fit=crop&q=80&w=1600",
+          image: "/images/series-b-2.webp",
           specs: [
             { icon: <Clock className="w-4 h-4"/>, label: t('spec_asm'), value: t('val_h4872') },
             { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_defl'), value: t('val_d150') },
@@ -1063,7 +1075,7 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_b3_s'),
           desc: t('step_b3_d'),
-          image: "https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?auto=format&fit=crop&q=80&w=1600",
+          image: "/images/series-b-3.webp",
           specs: [
             { icon: <Crosshair className="w-4 h-4"/>, label: t('spec_mob'), value: t('val_mhigh') },
             { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t10') },
@@ -1094,7 +1106,7 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_c1_s'),
           desc: t('step_c1_d'),
-          image: "https://images.unsplash.com/photo-1579768600109-242337a6b297?auto=format&fit=crop&q=80&w=1600",
+          image: "/images/series-c-1.webp",
           specs: [
             { icon: <Crosshair className="w-4 h-4"/>, label: t('spec_res'), value: t('val_r60') },
             { icon: <Zap className="w-4 h-4"/>, label: t('spec_pow'), value: t('val_sol') },
@@ -1105,7 +1117,7 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_c2_s'),
           desc: t('step_c2_d'),
-          image: "https://images.unsplash.com/photo-1563283296-613dcf68c48a?auto=format&fit=crop&q=80&w=1600",
+          image: "/images/series-c-2.webp",
           specs: [
             { icon: <Ruler className="w-4 h-4"/>, label: t('spec_dim'), value: t('val_dim') },
             { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t90') },
@@ -1211,17 +1223,18 @@ const Validation = () => {
     
          <div className="grid lg:grid-cols-12 gap-6 items-stretch">
            {/* Video / Crash Test visual */}
-           <div className="lg:col-span-8 liquid-glass rounded-3xl p-2 border border-white/10 relative min-h-[250px] lg:min-h-[450px] w-full h-full overflow-hidden group shadow-2xl flex flex-col items-center justify-center">
-             <div className="absolute inset-0 bg-[#0c0c0c] mix-blend-multiply z-0" />
-             
-             {/* Video placeholder interaction */}
-             <div className="absolute inset-0 flex items-center justify-center bg-brand/5 z-20">
-               <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 transition-transform group-hover:scale-105 hover:bg-white/20 cursor-pointer shadow-xl">
-                     <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[18px] border-l-white border-b-[10px] border-b-transparent ml-2" />
-                  </div>
-                  <div className="text-xs font-bold tracking-widest uppercase text-white/70">{t('sys_impact')}</div>
-               </div>
+           <div className="lg:col-span-8 liquid-glass rounded-3xl p-2 border border-white/10 relative min-h-[250px] lg:min-h-[450px] w-full overflow-hidden shadow-2xl">
+             {/* Responsive 16:9 YouTube embed */}
+             <div className="relative w-full h-full min-h-[246px] lg:min-h-[446px]" style={{ paddingBottom: 0 }}>
+               <iframe
+                 src="https://www.youtube.com/embed/5xgt8cTq_D0"
+                 title={t('sys_impact')}
+                 loading="lazy"
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                 allowFullScreen
+                 className="absolute inset-0 w-full h-full rounded-[22px]"
+                 style={{ border: 'none' }}
+               />
              </div>
            </div>
     
