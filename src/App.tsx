@@ -9,7 +9,7 @@ import { motion, useScroll, useMotionValueEvent, AnimatePresence, useMotionValue
 const LazyGlobe = lazy(() => import("./components/ui/globe").then(m => ({ default: m.Globe })));
 import ColorBends from "./components/ui/ColorBends";
 import GlassSurface from "./components/ui/GlassSurface";
-import { Shield, ChevronRight, Sparkles, CheckCircle2, Zap, Building, Crosshair, Layers, Hexagon, Ruler, Weight, ShieldAlert, Users, Thermometer, Clock } from "lucide-react";
+import { Shield, ChevronRight, Sparkles, CheckCircle2, Zap, Building, Crosshair, Layers, Hexagon, Ruler, Weight, ShieldAlert, Users, Thermometer, Clock, Menu, X } from "lucide-react";
 import Lenis from "lenis";
 
 const LogoMark = ({ className = "w-8 h-8" }: { className?: string }) => (
@@ -282,6 +282,9 @@ const TopNav = () => {
   const [hidden, setHidden] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [glassEnabled, setGlassEnabled] = useState(!((window as any).liquidGlassDisabled));
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const lang = useLanguage();
+  const langs = ['en', 'pl', 'uk', 'nl'];
   const { scrollY } = useScroll();
 
   const toggleGlass = () => {
@@ -291,24 +294,51 @@ const TopNav = () => {
     window.dispatchEvent(new CustomEvent('toggleLiquidGlass', { detail: { enabled: newState } }));
   };
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0;
     if (latest > previous && latest > 150) {
       setHidden(true);
+      setMobileOpen(false);
     } else {
       setHidden(false);
     }
   });
 
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    setMobileOpen(false);
+  };
+
   return (
     <>
       <div className="fixed top-0 left-0 right-0 h-40 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none z-40 opacity-70" />
       <div className="fixed bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0c0c0c] via-[#0c0c0c]/80 to-transparent pointer-events-none z-40 opacity-90" />
-      <div 
+      <div
         className="fixed top-0 left-0 right-0 h-24 z-[60]"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       />
+
+      {/* Mobile backdrop — closes menu on outside tap */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setMobileOpen(false)}
+            className="fixed inset-0 z-[65] bg-black/60 backdrop-blur-sm md:hidden"
+          />
+        )}
+      </AnimatePresence>
+
       <motion.div
         variants={{
           visible: { y: 0 },
@@ -320,30 +350,111 @@ const TopNav = () => {
         onMouseLeave={() => setIsHovered(false)}
         className="fixed top-4 left-0 right-0 z-[70] flex justify-center w-full px-4"
       >
-        <GlassSurface borderRadius={9999} className="w-full max-w-[65rem] rounded-full border border-white/10 hover:border-white/20 transition-all bg-[#0e1014]/40 shadow-2xl" contentClassName="flex items-center justify-between px-4 sm:px-6 py-3 w-full">
+        {/* Wrapper gives the dropdown a positioned anchor */}
+        <div className="w-full max-w-[65rem] relative">
+          <GlassSurface borderRadius={9999} className="w-full rounded-full border border-white/10 hover:border-white/20 transition-all bg-[#0e1014]/40 shadow-2xl" contentClassName="flex items-center justify-between px-4 sm:px-6 py-3 w-full">
             <div className="flex items-center gap-3">
-            <LogoMark className="w-6 h-6" />
-            <span className="font-bold tracking-widest text-sm hidden sm:block">ECHO SYSTEMS</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-[10px] lg:text-xs font-bold tracking-widest uppercase opacity-70">
-            <button onClick={() => document.getElementById('section-systems')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-white transition-colors">{t('sys')}</button>
-            <button onClick={() => document.getElementById('section-engineering')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-white transition-colors">{t('eng')}</button>
-            <button onClick={() => document.getElementById('section-about')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-white transition-colors">{t('abt')}</button>
-            <button onClick={toggleGlass} className={`flex items-center gap-1.5 transition-colors border-l border-white/10 pl-4 lg:pl-6 ml-1 lg:ml-2 ${glassEnabled ? 'text-emerald-400 hover:text-emerald-300' : 'text-white/40 hover:text-white'}`}>
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{glassEnabled ? 'FX ON' : 'FX OFF'}</span>
-            </button>
-          </nav>
-          <div className="flex items-center gap-2 lg:gap-4">
-             <div className="hidden xl:flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-white/50 border-r border-white/10 pr-4">
+              <LogoMark className="w-6 h-6" />
+              <span className="font-bold tracking-widest text-sm hidden sm:block">ECHO SYSTEMS</span>
+            </div>
+            <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-[10px] lg:text-xs font-bold tracking-widest uppercase opacity-70">
+              <button onClick={() => scrollTo('section-systems')} className="hover:text-white transition-colors">{t('sys')}</button>
+              <button onClick={() => scrollTo('section-engineering')} className="hover:text-white transition-colors">{t('eng')}</button>
+              <button onClick={() => scrollTo('section-about')} className="hover:text-white transition-colors">{t('abt')}</button>
+              <button onClick={toggleGlass} className={`flex items-center gap-1.5 transition-colors border-l border-white/10 pl-4 lg:pl-6 ml-1 lg:ml-2 ${glassEnabled ? 'text-emerald-400 hover:text-emerald-300' : 'text-white/40 hover:text-white'}`}>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{glassEnabled ? 'FX ON' : 'FX OFF'}</span>
+              </button>
+            </nav>
+            <div className="flex items-center gap-2 lg:gap-4">
+              <div className="hidden xl:flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-white/50 border-r border-white/10 pr-4">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div>
                 {t('secure')}
-             </div>
-            <SystemButton label={t('quote')} onClick={() => document.getElementById('contact-form')?.scrollIntoView({behavior: 'smooth'})} />
-            <LanguageSwitcher />
-          </div>
-        </GlassSurface>
-    </motion.div>
+              </div>
+              <SystemButton label={t('quote')} onClick={() => { document.getElementById('contact-form')?.scrollIntoView({behavior: 'smooth'}); setMobileOpen(false); }} />
+              <LanguageSwitcher />
+              {/* Hamburger — mobile only */}
+              <button
+                onClick={() => setMobileOpen(o => !o)}
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors ml-1"
+                aria-label="Toggle navigation menu"
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {mobileOpen ? (
+                    <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                      <X className="w-4 h-4" />
+                    </motion.span>
+                  ) : (
+                    <motion.span key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                      <Menu className="w-4 h-4" />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+            </div>
+          </GlassSurface>
+
+          {/* Mobile slide-down panel */}
+          <AnimatePresence>
+            {mobileOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className="md:hidden absolute top-[calc(100%+8px)] left-0 right-0 rounded-2xl border border-white/10 bg-[#0e1014]/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+              >
+                <div className="p-4 flex flex-col gap-1">
+                  {/* Nav links */}
+                  {[
+                    { label: t('sys'), id: 'section-systems' },
+                    { label: t('eng'), id: 'section-engineering' },
+                    { label: t('abt'), id: 'section-about' },
+                  ].map(link => (
+                    <button
+                      key={link.id}
+                      onClick={() => scrollTo(link.id)}
+                      className="w-full text-left px-4 py-3.5 rounded-xl text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white hover:bg-white/5 transition-all"
+                    >
+                      {link.label}
+                    </button>
+                  ))}
+
+                  <div className="border-t border-white/10 mt-2 pt-4 flex flex-col gap-3">
+                    {/* FX Toggle */}
+                    <button
+                      onClick={toggleGlass}
+                      className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold tracking-widest uppercase transition-all ${
+                        glassEnabled
+                          ? 'text-emerald-400 bg-emerald-500/5 border border-emerald-500/20'
+                          : 'text-white/40 bg-white/5 border border-white/10'
+                      }`}
+                    >
+                      <Sparkles className="w-4 h-4 shrink-0" />
+                      {glassEnabled ? 'Effects ON' : 'Effects OFF'}
+                    </button>
+
+                    {/* Inline language switcher */}
+                    <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1">
+                      {langs.map(l => (
+                        <button
+                          key={l}
+                          onClick={() => setLanguage(l)}
+                          className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all ${
+                            lang === l ? 'bg-white text-black' : 'text-white/40 hover:text-white'
+                          }`}
+                        >
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
     </>
   );
 };
@@ -591,7 +702,7 @@ const SystemViewer = () => {
                 animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, scale: 1.02, filter: 'blur(4px)' }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className="absolute inset-0 p-8 md:p-12 space-y-6 flex flex-col justify-center w-full"
+                className="relative lg:absolute lg:inset-0 p-5 sm:p-8 md:p-12 space-y-6 flex flex-col justify-center w-full"
               >
               <div className="liquid-glass p-8 min-h-[220px] rounded-2xl border border-white/5 bg-white/[0.02]">
                 <div className="flex flex-col sm:flex-row gap-6 mb-6">
@@ -707,19 +818,19 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
   });
 
   const imageClasses = 
-    idx === 0 ? "w-full lg:w-5/12 h-[500px] lg:h-[700px] rounded-[2rem]" :
-    idx === 1 ? "w-full lg:w-7/12 h-[400px] lg:h-[500px] rounded-[3rem]" :
-    "w-full lg:w-1/2 min-h-[400px] lg:min-h-[600px] aspect-square lg:aspect-video rounded-[1.5rem]";
+    idx === 0 ? "w-full lg:w-5/12 h-[300px] sm:h-[400px] lg:h-[700px] rounded-[2rem]" :
+    idx === 1 ? "w-full lg:w-7/12 h-[260px] sm:h-[350px] lg:h-[500px] rounded-[3rem]" :
+    "w-full lg:w-1/2 min-h-[260px] sm:min-h-[320px] lg:min-h-[600px] aspect-square lg:aspect-video rounded-[1.5rem]";
 
   return (
     <div id={`section-${section.id}`} className="w-full relative border-t border-white/5">
       {/* Sticky section */}
       <div ref={containerRef} className="relative w-full" style={{ height: `${section.steps.length * 100}vh` }}>
         <div className="sticky top-0 w-full h-[100dvh] flex flex-col justify-center overflow-hidden">
-          <div className="max-w-[70rem] mx-auto w-full px-6 lg:px-[50px] relative z-10 py-12">
+          <div className="max-w-[70rem] mx-auto w-full px-6 lg:px-[50px] relative z-10 py-4 md:py-8 lg:py-12">
             
             {/* Header & Image Layout */}
-            <div className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 lg:gap-20 items-center`}>
+            <div className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-6 sm:gap-10 lg:gap-20 items-center`}>
               
               {/* TEXT SIDE */}
               <div className="flex-1 w-full flex flex-col items-start z-10">
@@ -730,7 +841,7 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                   Series {section.id} &mdash; {section.tagline}
                 </div>
                 
-                <h2 className="text-4xl md:text-6xl lg:text-[4.5rem] xl:text-[5rem] font-black tracking-tighter uppercase leading-[1.05] mb-6">
+                <h2 className="text-3xl md:text-5xl lg:text-[4.5rem] xl:text-[5rem] font-black tracking-tighter uppercase leading-[1.05] mb-6">
                   {section.title}
                 </h2>
                 
@@ -742,7 +853,7 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
-                      className="absolute inset-0 flex flex-col"
+                      className="relative sm:absolute sm:inset-0 flex flex-col"
                     >
                       <h3 className="text-2xl font-bold mb-3" style={{ color: section.color }}>
                         {section.steps[activeStep].subtitle}
