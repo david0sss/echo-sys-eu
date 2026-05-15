@@ -557,7 +557,7 @@ const SystemViewer = () => {
   };
 
   return (
-    <section id="section-systems" className="relative px-6 lg:px-[50px] pt-12 pb-24 w-full max-w-[70rem] mx-auto z-30 -mt-24 lg:-mt-32 xl:-mt-48">
+    <section id="section-systems" className="relative px-6 lg:px-[50px] pt-12 pb-24 w-full max-w-[70rem] mx-auto z-30 -mt-16 sm:-mt-20 lg:-mt-32 xl:-mt-48">
       <motion.div 
         initial={{ opacity: 0, y: 50, filter: 'blur(10px)' }}
         whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -583,7 +583,7 @@ const SystemViewer = () => {
           </aside>
           
           {/* Main View */}
-          <div className="md:col-span-8 bg-transparent h-[750px] lg:h-[650px] relative overflow-hidden" style={{ transform: "translateZ(30px)" }}>
+          <div className="md:col-span-8 bg-transparent min-h-[500px] h-auto lg:h-[650px] relative overflow-hidden" style={{ transform: "translateZ(30px)" }}>
             <AnimatePresence mode="wait">
               <motion.div 
                 key={activeSystem.id}
@@ -715,7 +715,7 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
     <div id={`section-${section.id}`} className="w-full relative border-t border-white/5">
       {/* Sticky section */}
       <div ref={containerRef} className="relative w-full" style={{ height: `${section.steps.length * 100}vh` }}>
-        <div className="sticky top-0 w-full h-screen flex flex-col justify-center overflow-hidden">
+        <div className="sticky top-0 w-full h-[100dvh] flex flex-col justify-center overflow-hidden">
           <div className="max-w-[70rem] mx-auto w-full px-6 lg:px-[50px] relative z-10 py-12">
             
             {/* Header & Image Layout */}
@@ -734,7 +734,7 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                   {section.title}
                 </h2>
                 
-                <div className="h-[460px] sm:h-[360px] lg:h-[340px] relative w-full mb-8">
+                <div className="min-h-[320px] h-auto sm:h-[360px] lg:h-[340px] relative w-full mb-8">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeStep}
@@ -1100,7 +1100,7 @@ const Validation = () => {
     
          <div className="grid lg:grid-cols-12 gap-6 items-stretch">
            {/* Video / Crash Test visual */}
-           <div className="lg:col-span-8 liquid-glass rounded-3xl p-2 border border-white/10 relative min-h-[300px] lg:min-h-[450px] w-full h-full overflow-hidden group shadow-2xl flex flex-col items-center justify-center">
+           <div className="lg:col-span-8 liquid-glass rounded-3xl p-2 border border-white/10 relative min-h-[250px] lg:min-h-[450px] w-full h-full overflow-hidden group shadow-2xl flex flex-col items-center justify-center">
              <div className="absolute inset-0 bg-[#0c0c0c] mix-blend-multiply z-0" />
              
              {/* Video placeholder interaction */}
@@ -1218,7 +1218,7 @@ const DeploymentCTA = () => {
   const globeScale = useTransform(smoothScrollY, [0, 1], [1.4, 0.9]);
 
   return (
-    <section id="contact-form" ref={sectionRef} className="relative min-h-[100vh] w-full bg-[#0c0c0c] flex flex-col justify-end mt-32 z-20 overflow-hidden" style={{ background: 'linear-gradient(180deg, transparent 0%, #0a0a0a 8%, #080808 100%)' }}>
+    <section id="contact-form" ref={sectionRef} className="relative min-h-[100dvh] w-full bg-[#0c0c0c] flex flex-col justify-end mt-32 z-20 overflow-hidden" style={{ background: 'linear-gradient(180deg, transparent 0%, #0a0a0a 8%, #080808 100%)' }}>
       
       {/* Background DEPLOYMENT text — scaled down and strong parallax */}
       <motion.div 
