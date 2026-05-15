@@ -818,34 +818,34 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
   });
 
   const imageClasses = 
-    idx === 0 ? "w-full lg:w-5/12 h-[300px] sm:h-[400px] lg:h-[700px] rounded-[2rem]" :
-    idx === 1 ? "w-full lg:w-7/12 h-[260px] sm:h-[350px] lg:h-[500px] rounded-[3rem]" :
-    "w-full lg:w-1/2 min-h-[260px] sm:min-h-[320px] lg:min-h-[600px] aspect-square lg:aspect-video rounded-[1.5rem]";
+    idx === 0 ? "w-full lg:w-5/12 h-[260px] sm:h-[320px] md:h-[380px] lg:h-[700px] rounded-[2rem]" :
+    idx === 1 ? "w-full lg:w-7/12 h-[240px] sm:h-[300px] md:h-[360px] lg:h-[500px] rounded-[3rem]" :
+    "w-full lg:w-1/2 h-[240px] sm:h-[300px] md:h-[360px] lg:h-auto lg:min-h-[600px] lg:aspect-video rounded-[1.5rem]";
 
   return (
-    <div id={`section-${section.id}`} className="w-full relative border-t border-white/5">
+    <div id={`section-${section.id}`} className="w-full relative border-t border-white/5 scroll-mt-20">
       {/* Sticky section */}
       <div ref={containerRef} className="relative w-full" style={{ height: `${section.steps.length * 100}vh` }}>
         <div className="sticky top-0 w-full h-[100dvh] flex flex-col justify-center overflow-hidden">
           <div className="max-w-[70rem] mx-auto w-full px-6 lg:px-[50px] relative z-10 py-4 md:py-8 lg:py-12">
             
             {/* Header & Image Layout */}
-            <div className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-6 sm:gap-10 lg:gap-20 items-center`}>
+            <div className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-4 md:gap-6 lg:gap-20 items-center`}>
               
               {/* TEXT SIDE */}
               <div className="flex-1 w-full flex flex-col items-start z-10">
                 <div 
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-8 uppercase tracking-widest text-[10px] font-bold shadow-lg bg-black/40 backdrop-blur-md"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-4 lg:mb-8 uppercase tracking-widest text-[10px] font-bold shadow-lg bg-black/40 backdrop-blur-md"
                   style={{ borderColor: `${section.color}40`, color: section.color }}
                 >
                   Series {section.id} &mdash; {section.tagline}
                 </div>
                 
-                <h2 className="text-3xl md:text-5xl lg:text-[4.5rem] xl:text-[5rem] font-black tracking-tighter uppercase leading-[1.05] mb-6">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[4.5rem] xl:text-[5rem] font-black tracking-tighter uppercase leading-[1.05] mb-4 lg:mb-6">
                   {section.title}
                 </h2>
                 
-                <div className="min-h-[320px] h-auto sm:h-[360px] lg:h-[340px] relative w-full mb-8">
+                <div className="min-h-[200px] h-auto lg:h-[340px] relative w-full mb-6">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeStep}
@@ -853,12 +853,12 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
-                      className="relative sm:absolute sm:inset-0 flex flex-col"
+                      className="relative lg:absolute lg:inset-0 flex flex-col"
                     >
                       <h3 className="text-2xl font-bold mb-3" style={{ color: section.color }}>
                         {section.steps[activeStep].subtitle}
                       </h3>
-                      <p className="text-base sm:text-lg text-white/60 font-medium leading-relaxed max-w-xl mb-6">
+                      <p className="text-lg text-white/60 font-medium leading-relaxed max-w-xl mb-6">
                         {section.steps[activeStep].desc}
                       </p>
                       
@@ -877,7 +877,7 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                   </AnimatePresence>
                 </div>
 
-                <div className="flex items-center gap-4 mt-6">
+                <div className="flex items-center gap-4 mt-3 lg:mt-6">
                   <a href={`#model-${section.id.toLowerCase()}-${activeStep}`} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold uppercase tracking-widest">
                     {t('learn_more')} <ChevronRight className="w-4 h-4" />
                   </a>
