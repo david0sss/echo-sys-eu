@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 240" fill="none">
+  <!-- Outer arc (r=130, baseline y=160, top y=30) -->
+  <path d="M 130 160 A 130 130 0 0 1 390 160" stroke="currentColor" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- Middle arc (r=95, baseline y=160, top y=65) -->
+  <path d="M 165 160 A 95 95 0 0 1 355 160" stroke="currentColor" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- Inner arc (r=60, baseline y=160, top y=100) -->
+  <path d="M 200 160 A 60 60 0 0 1 320 160" stroke="currentColor" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- Text -->
+  <text x="260" y="218" text-anchor="middle" font-family="'Arial Black','Impact','Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="44" letter-spacing="4" fill="currentColor">ECHO SYSTEMS</text>
+</svg>
