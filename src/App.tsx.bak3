@@ -478,7 +478,7 @@ const TiltCard = ({ children, className, innerClassName = "grid grid-cols-1 md:g
   return (
     <motion.div
       ref={ref}
-      style={{ perspective: 1200 }}
+      style={{ perspective: 1200, contain: 'content' }}
       className={className}
       onClick={onClick}
     >

@@ -54,11 +54,12 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   const blueGradId = `blue-grad-${uniqueId}`;
 
   const [svgSupported, setSvgSupported] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const feImageRef = useRef<SVGFEImageElement>(null);
-  const displaceRef = useRef<SVGFEDisplacementMapElement>(null);
+  const redChannelRef = useRef<SVGFEDisplacementMapElement>(null);
+  const greenChannelRef = useRef<SVGFEDisplacementMapElement>(null);
+  const blueChannelRef = useRef<SVGFEDisplacementMapElement>(null);
   const gaussianBlurRef = useRef<SVGFEGaussianBlurElement>(null);
 
   const generateDisplacementMap = () => {
@@ -67,15 +68,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     const actualHeight = rect?.height || 200;
     const edgeSize = Math.min(actualWidth, actualHeight) * (borderWidth * 0.5);
 
-    // Use a smaller viewBox for the displacement map to reduce SVG rasterization cost
-    const mapScale = 0.5;
-    const mapW = Math.round(actualWidth * mapScale);
-    const mapH = Math.round(actualHeight * mapScale);
-    const mapEdge = Math.round(edgeSize * mapScale);
-    const mapRadius = Math.round(borderRadius * mapScale);
-
     const svgContent = `
-      <svg viewBox="0 0 ${mapW} ${mapH}" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 ${actualWidth} ${actualHeight}" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="${redGradId}" x1="100%" y1="0%" x2="0%" y2="0%">
             <stop offset="0%" stop-color="#0000"/>
@@ -86,10 +80,10 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
             <stop offset="100%" stop-color="blue"/>
           </linearGradient>
         </defs>
-        <rect x="0" y="0" width="${mapW}" height="${mapH}" fill="black"></rect>
-        <rect x="0" y="0" width="${mapW}" height="${mapH}" rx="${mapRadius}" fill="url(#${redGradId})" />
-        <rect x="0" y="0" width="${mapW}" height="${mapH}" rx="${mapRadius}" fill="url(#${blueGradId})" style="mix-blend-mode: ${mixBlendMode}" />
-        <rect x="${mapEdge}" y="${mapEdge}" width="${mapW - mapEdge * 2}" height="${mapH - mapEdge * 2}" rx="${mapRadius}" fill="hsl(0 0% ${brightness}% / ${opacity})" style="filter:blur(${Math.round(blur * mapScale)}px)" />
+        <rect x="0" y="0" width="${actualWidth}" height="${actualHeight}" fill="black"></rect>
+        <rect x="0" y="0" width="${actualWidth}" height="${actualHeight}" rx="${borderRadius}" fill="url(#${redGradId})" />
+        <rect x="0" y="0" width="${actualWidth}" height="${actualHeight}" rx="${borderRadius}" fill="url(#${blueGradId})" style="mix-blend-mode: ${mixBlendMode}" />
+        <rect x="${edgeSize}" y="${edgeSize}" width="${actualWidth - edgeSize * 2}" height="${actualHeight - edgeSize * 2}" rx="${borderRadius}" fill="hsl(0 0% ${brightness}% / ${opacity})" style="filter:blur(${blur}px)" />
       </svg>
     `;
 
@@ -101,25 +95,21 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   };
 
   useEffect(() => {
-    if (!svgSupported || !isVisible) return;
     updateDisplacementMap();
-    // Unified displacement scale — single operation instead of 3 separate channels
-    const avgScale = distortionScale + (redOffset + greenOffset + blueOffset) / 3;
-    if (displaceRef.current) {
-      displaceRef.current.setAttribute('scale', avgScale.toString());
-      displaceRef.current.setAttribute('xChannelSelector', xChannel);
-      displaceRef.current.setAttribute('yChannelSelector', yChannel);
-    }
+    [
+      { ref: redChannelRef, offset: redOffset },
+      { ref: greenChannelRef, offset: greenOffset },
+      { ref: blueChannelRef, offset: blueOffset }
+    ].forEach(({ ref, offset }) => {
+      if (ref.current) {
+        ref.current.setAttribute('scale', (distortionScale + offset).toString());
+        ref.current.setAttribute('xChannelSelector', xChannel);
+        ref.current.setAttribute('yChannelSelector', yChannel);
+      }
+    });
 
-    if (gaussianBlurRef.current) {
-      // Light chromatic fringe blur — this creates the dispersion look
-      // without needing 3 separate displacement passes
-      const fringeBlur = Math.max(0.3, displace + Math.abs(redOffset - blueOffset) * 0.15);
-      gaussianBlurRef.current.setAttribute('stdDeviation', fringeBlur.toString());
-    }
+    gaussianBlurRef.current?.setAttribute('stdDeviation', displace.toString());
   }, [
-    svgSupported,
-    isVisible,
     width,
     height,
     borderRadius,
@@ -143,7 +133,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     let timeoutId: any = null;
     const resizeObserver = new ResizeObserver(() => {
       if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(updateDisplacementMap, 150);
+      timeoutId = setTimeout(updateDisplacementMap, 100);
     });
 
     resizeObserver.observe(containerRef.current);
@@ -157,17 +147,6 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   useEffect(() => {
     setTimeout(updateDisplacementMap, 0);
   }, [width, height]);
-
-  // Visibility gating — only activate SVG filters when element is near viewport
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { rootMargin: '200px' }
-    );
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const handleToggle = (e: any) => {
@@ -204,9 +183,6 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     return div.style.backdropFilter !== '';
   };
 
-  // When SVG is supported but element is off-screen, use fallback to avoid GPU cost
-  const usesSvg = svgSupported && isVisible;
-
   const containerStyle: any = {
     ...style,
     width: typeof width === 'number' ? `${width}px` : width,
@@ -220,35 +196,58 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`glass-surface ${usesSvg ? 'glass-surface--svg' : 'glass-surface--fallback'} ${className}`}
+      className={`glass-surface ${svgSupported ? 'glass-surface--svg' : 'glass-surface--fallback'} ${className}`}
       style={containerStyle}
     >
-      {usesSvg && (
-        <svg className="glass-surface__filter" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id={filterId} colorInterpolationFilters="sRGB" x="0%" y="0%" width="100%" height="100%">
-              <feImage ref={feImageRef} x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="map" />
+      <svg className="glass-surface__filter" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id={filterId} colorInterpolationFilters="sRGB" x="0%" y="0%" width="100%" height="100%">
+            <feImage ref={feImageRef} x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="map" />
 
-              {/* Single displacement pass instead of 3 separate R/G/B channels */}
-              <feDisplacementMap
-                ref={displaceRef}
-                in="SourceGraphic"
-                in2="map"
-                result="displaced"
-              />
+            <feDisplacementMap ref={redChannelRef} in="SourceGraphic" in2="map" id="redchannel" result="dispRed" />
+            <feColorMatrix
+              in="dispRed"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
 
-              {/* Light gaussian blur creates the chromatic fringe / dispersion effect */}
-              {/* This approximates the 3-channel split visually at ~1/5 the GPU cost */}
-              <feGaussianBlur
-                ref={gaussianBlurRef}
-                in="displaced"
-                stdDeviation="0.3"
-                result="output"
-              />
-            </filter>
-          </defs>
-        </svg>
-      )}
+            <feDisplacementMap
+              ref={greenChannelRef}
+              in="SourceGraphic"
+              in2="map"
+              id="greenchannel"
+              result="dispGreen"
+            />
+            <feColorMatrix
+              in="dispGreen"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="green"
+            />
+
+            <feDisplacementMap ref={blueChannelRef} in="SourceGraphic" in2="map" id="bluechannel" result="dispBlue" />
+            <feColorMatrix
+              in="dispBlue"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="blue"
+            />
+
+            <feBlend in="red" in2="green" mode="screen" result="rg" />
+            <feBlend in="rg" in2="blue" mode="screen" result="output" />
+          </filter>
+        </defs>
+      </svg>
 
       <div className={`glass-surface__content ${contentClassName}`}>{children}</div>
     </div>

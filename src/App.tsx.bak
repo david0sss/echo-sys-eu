@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import LogoLoop from "./components/LogoLoop";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence, useMotionValue, useTransform, useSpring } from "motion/react";
-const LazyGlobe = lazy(() => import("./components/ui/globe").then(m => ({ default: m.Globe })));
+import { Globe } from "./components/ui/globe";
 import ColorBends from "./components/ui/ColorBends";
 import GlassSurface from "./components/ui/GlassSurface";
 import { Shield, ChevronRight, Activity, Sparkles, CheckCircle2, Fan, Zap, Building, Crosshair, Layers, Hexagon, Ruler, Weight, ShieldAlert, Users, Thermometer, Clock } from "lucide-react";
@@ -403,7 +403,6 @@ const TiltCard = ({ children, className, innerClassName = "grid grid-cols-1 md:g
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const isVisibleRef = useRef(false);
 
   const springConfig = { stiffness: 150, damping: 20, mass: 0.5 };
   const smoothX = useSpring(x, springConfig);
@@ -412,46 +411,27 @@ const TiltCard = ({ children, className, innerClassName = "grid grid-cols-1 md:g
   const rotateX = useTransform(smoothY, [-1, 1], [intensity, -intensity]);
   const rotateY = useTransform(smoothX, [-1, 1], [-intensity, intensity]);
 
-  // Visibility gating — only track mouse when card is near viewport
   useEffect(() => {
-    if (!ref.current) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisibleRef.current = entry.isIntersecting;
-        if (!entry.isIntersecting) {
-          // Smoothly reset tilt when leaving viewport
-          x.set(0);
-          y.set(0);
-        }
-      },
-      { rootMargin: '100px' }
-    );
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [x, y]);
-
-  useEffect(() => {
-    let rafId: number | null = null;
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-
-    const update = () => {
-      rafId = null;
-      if (!ref.current || !isVisibleRef.current) return;
-
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!ref.current) return;
+      
       const rect = ref.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
+      
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      
+      const distanceX = mouseX - centerX;
+      const distanceY = mouseY - centerY;
 
-      const distanceX = lastMouseX - centerX;
-      const distanceY = lastMouseY - centerY;
       const currentDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
+      
       if (currentDistance < distance) {
          const normalizedX = distanceX / (distance / 2);
          const normalizedY = distanceY / (distance / 2);
          const strength = 1 - Math.pow(currentDistance / distance, 2);
-
+         
          x.set(Math.max(-1, Math.min(1, normalizedX)) * strength);
          y.set(Math.max(-1, Math.min(1, normalizedY)) * strength);
       } else {
@@ -460,19 +440,8 @@ const TiltCard = ({ children, className, innerClassName = "grid grid-cols-1 md:g
       }
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      lastMouseX = e.clientX;
-      lastMouseY = e.clientY;
-      if (rafId === null && isVisibleRef.current) {
-        rafId = requestAnimationFrame(update);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (rafId !== null) cancelAnimationFrame(rafId);
-    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [distance, x, y]);
 
   return (
@@ -1238,9 +1207,7 @@ const DeploymentCTA = () => {
         className="absolute top-[8vh] md:top-[6vh] left-1/2 -translate-x-1/2 z-[1] pointer-events-none" 
         style={{ width: 'min(90vw, 85vh)', height: 'min(90vw, 85vh)', y: globeY, scale: globeScale }}
       >
-        <Suspense fallback={null}>
-          <LazyGlobe className="w-full h-full pointer-events-auto" />
-        </Suspense>
+        <Globe className="w-full h-full pointer-events-auto" />
       </motion.div>
 
       {/* Subtle radial glow behind globe */}
@@ -1443,19 +1410,17 @@ export default function App() {
       touchMultiplier: 2,
     });
 
-    let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
+      requestAnimationFrame(raf);
     }
 
-    rafId = requestAnimationFrame(raf);
+    requestAnimationFrame(raf);
 
     return () => {
-      cancelAnimationFrame(rafId);
       lenis.destroy();
     };
-  }, [isLoading]);
+  }, []);
 
   const { scrollYProgress: globalScroll } = useScroll();
   const bgY = useTransform(globalScroll, [0, 1], ["-10%", "10%"]);
@@ -1497,12 +1462,12 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <div className="noise-bg z-10 pointer-events-none mix-blend-overlay opacity-30" style={{ willChange: 'transform', contain: 'strict' }}></div>
+      <div className="noise-bg z-10 pointer-events-none mix-blend-overlay opacity-30"></div>
       
       {/* Global Background ColorBends */}
       <motion.div 
         className="fixed inset-0 z-0 pointer-events-none"
-        style={{ y: bgY, scale: 1.2, willChange: 'transform', contain: 'layout paint' }}
+        style={{ y: bgY, scale: 1.2 }}
       >
         <div className="w-full h-full opacity-60 mix-blend-screen">
           <ColorBends
@@ -1529,8 +1494,8 @@ export default function App() {
       <div className="fixed right-[max(0px,calc(50%-40rem))] inset-y-0 w-px bg-white/5 pointer-events-none z-0 hidden lg:block border-l border-dashed border-white/10"></div>
 
       <TopNav />
-      {/* Top Gradient — opaque gradient, no backdrop-filter needed on a dark page */}
-      <div className="fixed top-0 inset-x-0 h-[40vh] bg-gradient-to-b from-[#0c0c0c] via-[#0c0c0c]/80 to-transparent pointer-events-none z-40 hidden md:block" style={{ willChange: 'transform' }}></div>
+      {/* Top Gradient */}
+      <div className="fixed top-0 inset-x-0 h-[40vh] bg-gradient-to-b from-[#0c0c0c] via-[#0c0c0c]/80 to-transparent pointer-events-none z-40 hidden md:block" style={{ backdropFilter: 'blur(20px)', maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)' }}></div>
 
       <div className="relative z-10 flex flex-col w-full max-w-[100vw]">
          
