@@ -1,0 +1,20 @@
+231: <span className="font-bold tracking-widest text-sm hidden sm:block">ECHO SYSTEMS</span>
+263: <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-white/90">EU-Certified Protection</span>
+498: <div className="text-[10px] opacity-40 uppercase tracking-widest mb-4">Legal Entity</div>
+500: <div className="flex flex-col gap-1 border-b border-white/10 pb-3"><span className="text-white/40 uppercase text-[10px]">KRS</span><span>0000991436</span></div>
+501: <div className="flex flex-col gap-1 border-b border-white/10 pb-3"><span className="text-white/40 uppercase text-[10px]">NIP</span><span>5242950185</span></div>
+502: <div className="flex flex-col gap-1 border-b sm:border-b-0 border-white/10 pb-3 sm:pb-0"><span className="text-white/40 uppercase text-[10px]">REGON</span><span>523080793</span></div>
+503: <div className="flex flex-col gap-1"><span className="text-white/40 uppercase text-[10px]">Address</span><span>ul. Rejtana 6/1<br/>87-100 Toruń</span></div>
+907: node: <span className="flex items-center justify-center whitespace-nowrap font-mono text-base tracking-widest text-white/40 hover:text-white transition-colors cursor-pointer">STANAG 2280</span>,
+912: node: <span className="flex items-center justify-center whitespace-nowrap font-mono text-base tracking-widest text-white/40 hover:text-white transition-colors cursor-pointer">EN 1143-1</span>,
+917: node: <span className="flex items-center justify-center whitespace-nowrap font-mono text-base tracking-widest text-white/40 hover:text-white transition-colors cursor-pointer">FCC / CE Marked</span>,
+922: node: <span className="flex items-center justify-center whitespace-nowrap font-mono text-base tracking-widest text-white/40 hover:text-white transition-colors cursor-pointer">NBC Filter Class 3</span>,
+927: node: <span className="flex items-center justify-center whitespace-nowrap font-mono text-base tracking-widest text-white/40 hover:text-white transition-colors cursor-pointer">DEF STAN 08-103</span>,
+1183: <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/30">For Inquiries</span>
+1196: <span className="hidden md:inline">KRS 0000991436</span>
+1198: <span className="hidden md:inline">NIP 5242950185</span>
+1244: <h3 className="text-2xl md:text-3xl font-black text-[#0c0c0c] tracking-tight">Contact</h3>
+1251: <label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">Name</label>
+1255: <label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">Email</label>
+1259: <label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">Organisation</label>
+1263: <label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">Message</label>
