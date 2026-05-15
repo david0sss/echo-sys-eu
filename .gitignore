@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Dev-only tooling output (generated file, not tracked)
+dev-tools/untranslated.txt

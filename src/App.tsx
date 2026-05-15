@@ -9,7 +9,7 @@ import { motion, useScroll, useMotionValueEvent, AnimatePresence, useMotionValue
 const LazyGlobe = lazy(() => import("./components/ui/globe").then(m => ({ default: m.Globe })));
 import ColorBends from "./components/ui/ColorBends";
 import GlassSurface from "./components/ui/GlassSurface";
-import { Shield, ChevronRight, Activity, Sparkles, CheckCircle2, Fan, Zap, Building, Crosshair, Layers, Hexagon, Ruler, Weight, ShieldAlert, Users, Thermometer, Clock } from "lucide-react";
+import { Shield, ChevronRight, Sparkles, CheckCircle2, Zap, Building, Crosshair, Layers, Hexagon, Ruler, Weight, ShieldAlert, Users, Thermometer, Clock } from "lucide-react";
 import Lenis from "lenis";
 
 const LogoMark = ({ className = "w-8 h-8" }: { className?: string }) => (
@@ -259,11 +259,6 @@ const LanguageSwitcher = () => {
   );
 };
 
-const AppleLogo = () => (
-  <svg viewBox="0 0 384 512" className="w-3.5 h-3.5 fill-current">
-    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 24 184.8 8 273.5q-22.6 125.1 48 238c18 29.1 44.8 54.3 75.6 52.8 28.5-1.4 46-17.7 82.2-17.7 35.8 0 54 18 84.4 17.4 33.2-.6 56.6-25.9 74.3-55.5 22.4-37.4 31.9-74.2 32.5-76-1.1-.3-86.8-32.9-86.3-163.8zM245.2 92.4c2.8-25.5 18-50.5 40.5-67 1.8-1.5 4.3-3 6.9-4-15.6-22.3-43.1-37-68-37-25.5-1.5-51 13.5-65.5 31-15 18-28.5 43.5-25.5 69.5 23.5 2 48-10.5 63-28.5 3-3.6 6-7.8 8.6-14z"/>
-  </svg>
-);
 
 const SystemButton = ({ label = "Explore Systems", onClick }: { label?: string, onClick?: () => void }) => {
   const handleClick = (e: any) => {
@@ -689,6 +684,8 @@ const SecurityClassSlider = ({ classes, activeColor }: { classes: any[], activeC
   );
 };
 
+// key?: any is kept to satisfy TypeScript at the call site — React's `key` is a reserved prop
+// that never reaches the component body. This is not a real prop; it is a TSC suppressor only.
 const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?: any }) => {
   const isReversed = idx % 2 !== 0;
   const containerRef = useRef<HTMLDivElement>(null);
