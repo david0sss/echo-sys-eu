@@ -350,14 +350,26 @@ const TopNav = () => {
         onMouseLeave={() => setIsHovered(false)}
         className="fixed top-4 left-0 right-0 z-[70] flex justify-center w-full px-4"
       >
+        {/* FX Toggle — standalone floating bubble, anchored to viewport right edge */}
+        <button
+          onClick={toggleGlass}
+          className={`hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-10 items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase transition-all backdrop-blur-md border shadow-xl ${
+            glassEnabled
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+              : 'bg-black/40 border-white/10 text-white/40 hover:text-white hover:bg-white/10'
+          }`}
+        >
+          <Sparkles className="w-3 h-3" />
+          <span>{glassEnabled ? 'FX ON' : 'FX OFF'}</span>
+        </button>
         {/* Wrapper gives the dropdown a positioned anchor */}
         <div className="w-full max-w-[65rem] relative">
           <GlassSurface borderRadius={9999} className="w-full rounded-full border border-white/10 hover:border-white/20 transition-all bg-[#0e1014]/40 shadow-2xl" contentClassName="flex items-center justify-between px-4 sm:px-6 py-3 w-full">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <img
                 src="/images/logo-main.svg"
                 alt="ECHO SYSTEMS"
-                className="w-6 h-6 object-contain brightness-0 invert"
+                className="h-10 w-auto object-contain brightness-0 invert"
                 loading="eager"
               />
             </div>
@@ -366,22 +378,6 @@ const TopNav = () => {
               <button onClick={() => scrollTo('section-about')} className="hover:text-white transition-colors">{t('abt')}</button>
             </nav>
             <div className="flex items-center gap-2 lg:gap-3">
-              {/* Pulsing status dot */}
-              <div className="hidden xl:flex items-center pr-2 border-r border-white/10">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div>
-              </div>
-              {/* FX Toggle — isolated glass bubble */}
-              <button
-                onClick={toggleGlass}
-                className={`hidden md:flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase transition-all backdrop-blur-md border ${
-                  glassEnabled
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
-                    : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <Sparkles className="w-3 h-3" />
-                <span>{glassEnabled ? 'FX ON' : 'FX OFF'}</span>
-              </button>
               <SystemButton label={t('quote')} onClick={() => { document.getElementById('contact-form')?.scrollIntoView({behavior: 'smooth'}); setMobileOpen(false); }} />
               <LanguageSwitcher />
               {/* Hamburger — mobile only */}
@@ -897,7 +893,7 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                 <div className="flex items-center gap-4 mt-3 lg:mt-6">
                   <button
                     onClick={() => {
-                      const nextIds = ['section-B', 'section-C', 'section-about'];
+                      const nextIds = ['section-A-features', 'section-B-features', 'section-about'];
                       document.getElementById(nextIds[idx] ?? 'section-about')?.scrollIntoView({ behavior: 'smooth' });
                     }}
                     className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold uppercase tracking-widest"
@@ -952,7 +948,7 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
       </div>
 
       {/* Non-sticky part: Features & Security */ }
-      <div className="relative w-full z-10 bg-transparent py-24 border-y border-white/10 overflow-hidden">
+      <div id={`section-${section.id}-features`} className="relative w-full z-10 bg-transparent py-24 border-y border-white/10 overflow-hidden">
         
         {/* Large background text */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0">
@@ -1480,7 +1476,7 @@ const DeploymentCTA = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={() => setShowContact(false)}
-              className="fixed inset-0 z-[80] pointer-events-auto bg-gradient-to-t from-black/90 via-black/40 to-transparent"
+              className="fixed inset-0 z-[9998] pointer-events-auto bg-gradient-to-t from-black/90 via-black/40 to-transparent"
               style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', maskImage: 'linear-gradient(to top, black 0%, transparent 80%)', WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 80%)' }}
             />
 
@@ -1490,7 +1486,7 @@ const DeploymentCTA = () => {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "120%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 35 }}
-              className="fixed bottom-4 md:bottom-8 left-4 right-4 md:left-8 md:right-8 z-[90] pointer-events-none max-w-[85rem] mx-auto"
+              className="fixed bottom-4 md:bottom-8 left-4 right-4 md:left-8 md:right-8 z-[9999] pointer-events-none max-w-[85rem] mx-auto"
             >
               <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] px-6 md:px-10 py-8 md:py-10 border border-white/20 pointer-events-auto">
                 
