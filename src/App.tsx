@@ -270,7 +270,7 @@ const SystemButton = ({ label = "Explore Systems", onClick }: { label?: string, 
   };
   
   return (
-    <button onClick={handleClick} className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-black font-semibold text-xs px-6 py-2.5 transition-all hover:bg-white/90 active:scale-[0.98]">
+    <button onClick={handleClick} className="cursor-pointer group inline-flex items-center justify-center gap-2 rounded-full bg-white text-black font-semibold text-xs px-6 py-2.5 transition-all hover:bg-white/90 active:scale-[0.98]">
       <Shield className="w-4 h-4" />
       <span>{label}</span>
       <ChevronRight className="w-4 h-4 opacity-50 transition-transform group-hover:translate-x-1" />
@@ -774,7 +774,7 @@ const SecurityClassSlider = ({ classes, activeColor }: { classes: any[], activeC
             <button 
               key={cls.id}
               onClick={() => setActive(i)}
-              className={`flex-1 py-3 text-xs font-bold transition-all relative z-10 ${active === i ? 'text-white' : 'text-white/40 hover:text-white/80'}`}
+              className={`cursor-pointer flex-1 py-3 text-xs font-bold transition-all relative z-10 ${active === i ? 'text-white' : 'text-white/40 hover:text-white/80'}`}
             >
               {cls.id}
             </button>
@@ -894,9 +894,13 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                   <button
                     onClick={() => {
                       const nextIds = ['section-A-features', 'section-B-features', 'section-about'];
-                      document.getElementById(nextIds[idx] ?? 'section-about')?.scrollIntoView({ behavior: 'smooth' });
+                      const el = document.getElementById(nextIds[idx] ?? 'section-about');
+                      if (el) {
+                        const y = el.getBoundingClientRect().top + window.scrollY - 250;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                      }
                     }}
-                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold uppercase tracking-widest"
+                    className="cursor-pointer inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold uppercase tracking-widest"
                   >
                     {t('learn_more')} <ChevronRight className="w-4 h-4" />
                   </button>
@@ -1398,7 +1402,7 @@ const DeploymentCTA = ({ onOpenContact, showContact }: { onOpenContact: () => vo
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.3 }}
                     onClick={onOpenContact}
-                    className="group flex items-center gap-0 bg-white/95 hover:bg-white rounded-full shadow-[0_4px_40px_rgba(255,255,255,0.15)] hover:shadow-[0_4px_60px_rgba(255,255,255,0.25)] transition-all duration-300"
+                    className="cursor-pointer group flex items-center gap-0 bg-white/95 hover:bg-white rounded-full shadow-[0_4px_40px_rgba(255,255,255,0.15)] hover:shadow-[0_4px_60px_rgba(255,255,255,0.25)] transition-all duration-300"
                   >
                     <span className="px-8 py-4 text-[#0c0c0c] font-bold text-sm tracking-wide">
                       {t('deploy')}

@@ -56,3 +56,13 @@
   contain: strict;
   transform: translateZ(0);
 }
+
+/* Global interactive cursor — fixes Tailwind v4 Preflight gap */
+button,
+[role="button"],
+a[href],
+label[for],
+select,
+summary {
+  cursor: pointer;
+}
