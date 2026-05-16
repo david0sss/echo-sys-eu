@@ -881,8 +881,8 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                           <GlassSurface key={i} borderRadius={12} className="bg-[#ffffff0a] border border-white/20 relative group shadow-lg w-full h-full" contentClassName="flex flex-col p-2.5 sm:p-3 justify-center">
                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div className="opacity-40 mb-1.5 sm:mb-2 relative z-10" style={{ color: section.color }}>{spec.icon}</div>
-                            <div className="text-[9px] sm:text-[10px] uppercase tracking-wider md:tracking-widest font-bold opacity-50 mb-0.5 relative z-10 line-clamp-1">{spec.label}</div>
-                            <div className="text-[11px] sm:text-sm font-bold tracking-tight relative z-10 leading-tight">{spec.value}</div>
+                            <div className="text-[9px] sm:text-[10px] uppercase tracking-tight font-bold opacity-50 mb-0.5 relative z-10 line-clamp-2 break-words">{spec.label}</div>
+                            <div className="text-[11px] sm:text-sm font-bold tracking-tight relative z-10 leading-tight break-words line-clamp-2">{spec.value}</div>
                           </GlassSurface>
                         ))}
                       </div>
