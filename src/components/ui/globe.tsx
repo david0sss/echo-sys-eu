@@ -42,6 +42,8 @@ export function Globe({
   const pointerInteracting = useRef<number | null>(null)
   const pointerInteractionMovement = useRef(0)
   const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null)
+  // Visibility gating — pause WebGL RAF when globe is off-screen
+  const isVisibleRef = useRef(false)
 
   const r = useMotionValue(0)
   const rs = useSpring(r, {
@@ -82,6 +84,8 @@ export function Globe({
       width: widthRef.current * 2,
       height: widthRef.current * 2,
       onRender: (state) => {
+        // Skip render work when globe is off-screen
+        if (!isVisibleRef.current) return
         if (!pointerInteracting.current) phiRef.current += 0.003
         state.phi = phiRef.current + rs.get()
         state.width = widthRef.current * 2
@@ -109,11 +113,21 @@ export function Globe({
 
     window.addEventListener("resize", onResize)
 
+    // Pause onRender work when globe is scrolled out of view
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting
+      },
+      { rootMargin: '200px' }
+    )
+    if (canvasRef.current) visibilityObserver.observe(canvasRef.current)
+
     return () => {
       if (globeRef.current) {
         globeRef.current.destroy()
       }
       window.removeEventListener("resize", onResize)
+      visibilityObserver.disconnect()
     }
   }, [initGlobe])
 

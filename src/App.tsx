@@ -1201,7 +1201,8 @@ const Validation = () => {
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0;
     if (Math.abs(latest - previous) > 5) {
-      setActiveCert(null);
+      // Only update state if a cert is actually open — avoids scroll-driven re-renders
+      if (activeCert !== null) setActiveCert(null);
     }
   });
 
@@ -1238,7 +1239,7 @@ const Validation = () => {
              {/* Responsive 16:9 YouTube embed */}
              <div className="relative w-full h-full min-h-[246px] lg:min-h-[446px]" style={{ paddingBottom: 0 }}>
                <iframe
-                 src="https://www.youtube.com/embed/5xgt8cTq_D0"
+                 src="https://www.youtube.com/embed/5xgt8cTq_D0?rel=0&modestbranding=1"
                  title={t('sys_impact')}
                  loading="lazy"
                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
