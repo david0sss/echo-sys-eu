@@ -348,23 +348,11 @@ const TopNav = () => {
         transition={{ duration: 0.35, ease: "easeInOut" }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="fixed top-4 left-0 right-0 z-[70] flex justify-center w-full px-4"
+        className="fixed top-4 left-0 right-0 z-[70] flex justify-center items-center gap-3 w-full px-4"
       >
-        {/* FX Toggle — standalone floating bubble, anchored to viewport right edge */}
-        <button
-          onClick={toggleGlass}
-          className={`hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-10 items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase transition-all backdrop-blur-md border shadow-xl ${
-            glassEnabled
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
-              : 'bg-black/40 border-white/10 text-white/40 hover:text-white hover:bg-white/10'
-          }`}
-        >
-          <Sparkles className="w-3 h-3" />
-          <span>{glassEnabled ? 'FX ON' : 'FX OFF'}</span>
-        </button>
-        {/* Wrapper gives the dropdown a positioned anchor */}
-        <div className="w-full max-w-[65rem] relative">
-          <GlassSurface borderRadius={9999} className="w-full rounded-full border border-white/10 hover:border-white/20 transition-all bg-[#0e1014]/40 shadow-2xl" contentClassName="flex items-center justify-between px-4 sm:px-6 py-3 w-full">
+        {/* Auto-shrinking pill anchors mobile dropdown */}
+        <div className="relative">
+          <GlassSurface borderRadius={9999} className="rounded-full border border-white/10 hover:border-white/20 transition-all bg-[#0e1014]/40 shadow-2xl" contentClassName="flex items-center gap-5 lg:gap-8 px-4 sm:px-5 py-3">
             <div className="flex items-center">
               <img
                 src="/images/logo-main.svg"
@@ -374,8 +362,8 @@ const TopNav = () => {
               />
             </div>
             <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-[10px] lg:text-xs font-bold tracking-widest uppercase opacity-70">
-              <button onClick={() => scrollTo('section-systems')} className="hover:text-white transition-colors">{t('eng')}</button>
-              <button onClick={() => scrollTo('section-about')} className="hover:text-white transition-colors">{t('abt')}</button>
+              <button onClick={() => scrollTo('section-systems')} className="cursor-pointer hover:text-white transition-colors">{t('eng')}</button>
+              <button onClick={() => scrollTo('section-about')} className="cursor-pointer hover:text-white transition-colors">{t('abt')}</button>
             </nav>
             <div className="flex items-center gap-2 lg:gap-3">
               <SystemButton label={t('quote')} onClick={() => { document.getElementById('contact-form')?.scrollIntoView({behavior: 'smooth'}); setMobileOpen(false); }} />
@@ -383,7 +371,7 @@ const TopNav = () => {
               {/* Hamburger — mobile only */}
               <button
                 onClick={() => setMobileOpen(o => !o)}
-                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors ml-1"
+                className="md:hidden cursor-pointer flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors ml-1"
                 aria-label="Toggle navigation menu"
               >
                 <AnimatePresence mode="wait" initial={false}>
@@ -420,7 +408,7 @@ const TopNav = () => {
                     <button
                       key={link.id}
                       onClick={() => scrollTo(link.id)}
-                      className="w-full text-left px-4 py-3.5 rounded-xl text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white hover:bg-white/5 transition-all"
+                      className="cursor-pointer w-full text-left px-4 py-3.5 rounded-xl text-xs font-bold tracking-widest uppercase text-white/70 hover:text-white hover:bg-white/5 transition-all"
                     >
                       {link.label}
                     </button>
@@ -460,6 +448,18 @@ const TopNav = () => {
             )}
           </AnimatePresence>
         </div>
+        {/* FX Toggle — flex sibling of pill */}
+        <button
+          onClick={toggleGlass}
+          className={`hidden md:flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase transition-all backdrop-blur-md border shadow-xl ${
+            glassEnabled
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+              : 'bg-black/40 border-white/10 text-white/40 hover:text-white hover:bg-white/10'
+          }`}
+        >
+          <Sparkles className="w-3 h-3" />
+          <span>{glassEnabled ? 'FX ON' : 'FX OFF'}</span>
+        </button>
       </motion.div>
     </>
   );
@@ -690,7 +690,7 @@ const SystemViewer = () => {
                 <div 
                   key={sys.id} 
                   onClick={(e) => { e.stopPropagation(); setActiveTab(i); }}
-                  className={`flex items-center justify-between p-4 text-sm font-medium cursor-pointer rounded-xl border transition-all ${activeTab === i ? 'bg-white/10 border-white/20 text-white shadow-lg' : 'bg-transparent border-transparent opacity-60 hover:opacity-100 hover:bg-white/5'}`}
+                  className={`cursor-pointer flex items-center justify-between p-4 text-sm font-medium rounded-xl border transition-all ${activeTab === i ? 'bg-white/10 border-white/20 text-white shadow-lg' : 'bg-transparent border-transparent opacity-60 hover:opacity-100 hover:bg-white/5'}`}
                 >
                   <span className="truncate mr-4">{sys.short}</span>
                   <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === i ? 'opacity-100' : 'opacity-0 -translate-x-2'}`} />
@@ -1316,24 +1316,10 @@ const Validation = () => {
   );
 };
 
-const DeploymentCTA = () => {
+const DeploymentCTA = ({ onOpenContact, showContact }: { onOpenContact: () => void; showContact: boolean }) => {
   const lang = useLanguage();
-  const [showContact, setShowContact] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollY } = useScroll();
-
-  useEffect(() => {
-    const handleOpen = () => setShowContact(true);
-    window.addEventListener('openContact', handleOpen);
-    return () => window.removeEventListener('openContact', handleOpen);
-  }, []);
-
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    if (Math.abs(latest - previous) > 5) {
-      setShowContact(false);
-    }
-  });
   
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -1411,7 +1397,7 @@ const DeploymentCTA = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.3 }}
-                    onClick={() => setShowContact(true)}
+                    onClick={onOpenContact}
                     className="group flex items-center gap-0 bg-white/95 hover:bg-white rounded-full shadow-[0_4px_40px_rgba(255,255,255,0.15)] hover:shadow-[0_4px_60px_rgba(255,255,255,0.25)] transition-all duration-300"
                   >
                     <span className="px-8 py-4 text-[#0c0c0c] font-bold text-sm tracking-wide">
@@ -1465,84 +1451,6 @@ const DeploymentCTA = () => {
         </div>
       </div>
 
-      {/* ---- Contact Form Overlay (JeskoJets style — floating box) ---- */}
-      <AnimatePresence>
-        {showContact && (
-          <>
-            {/* Backdrop with bottom gradient blur */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => setShowContact(false)}
-              className="fixed inset-0 z-[9998] pointer-events-auto bg-gradient-to-t from-black/90 via-black/40 to-transparent"
-              style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', maskImage: 'linear-gradient(to top, black 0%, transparent 80%)', WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 80%)' }}
-            />
-
-            {/* Floating Contact form box */}
-            <motion.div
-              initial={{ y: "120%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "120%", opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 35 }}
-              className="fixed bottom-4 md:bottom-8 left-4 right-4 md:left-8 md:right-8 z-[9999] pointer-events-none max-w-[85rem] mx-auto"
-            >
-              <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] px-6 md:px-10 py-8 md:py-10 border border-white/20 pointer-events-auto">
-                
-                {/* Close button attached to the top right of the box */}
-                <button
-                  onClick={() => setShowContact(false)}
-                  className="absolute -top-4 -right-4 md:-top-5 md:-right-5 z-[100] w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0c0c0c] text-white flex items-center justify-center shadow-2xl hover:bg-[#1a1a1a] transition-colors border border-white/10 hover:scale-105"
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 1L13 13M1 13L13 1"/></svg>
-                </button>
-
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
-                  
-                  {/* Title */}
-                  <div className="shrink-0">
-                    <h3 className="text-2xl md:text-3xl font-black text-[#0c0c0c] tracking-tight">{t('contact')}</h3>
-                  </div>
-
-                  {/* Form fields */}
-                  <form onSubmit={(e) => { e.preventDefault(); setShowContact(false); }} className="flex-1 w-full flex flex-col md:flex-row items-stretch gap-4 md:gap-0">
-                    <div className="flex-1 flex flex-col md:flex-row">
-                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10">
-                        <label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_name')}</label>
-                        <input type="text" placeholder="Type..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" />
-                      </div>
-                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10">
-                        <label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_email')}</label>
-                        <input type="email" placeholder="Email..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" />
-                      </div>
-                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10">
-                        <label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_org')}</label>
-                        <input type="text" placeholder="Company..." className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" />
-                      </div>
-                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0">
-                        <label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_msg')}</label>
-                        <input type="text" placeholder="Your inquiry..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" />
-                      </div>
-                    </div>
-                    
-                    {/* Submit circle */}
-                    <button type="submit" className="shrink-0 w-full md:w-12 h-12 rounded-full md:rounded-full bg-[#0c0c0c] text-white flex items-center justify-center hover:bg-[#1a1a1a] transition-colors shadow-lg md:ml-4 mt-3 md:mt-0">
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </form>
-                </div>
-                
-                {/* Privacy note */}
-                <div className="mt-5 flex items-center gap-2 text-[10px] text-[#0c0c0c]/30 font-medium uppercase tracking-widest">
-                  <div className="w-3 h-3 rounded-full border border-[#0c0c0c]/20" />
-                  By submitting, you agree to our privacy policy
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </section>
   );
 };
@@ -1550,6 +1458,19 @@ const DeploymentCTA = () => {
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [showContact, setShowContact] = useState(false);
+  const { scrollY: appScrollY } = useScroll();
+
+  useEffect(() => {
+    const handleOpen = () => setShowContact(true);
+    window.addEventListener('openContact', handleOpen);
+    return () => window.removeEventListener('openContact', handleOpen);
+  }, []);
+
+  useMotionValueEvent(appScrollY, 'change', (latest) => {
+    const previous = appScrollY.getPrevious() ?? 0;
+    if (Math.abs(latest - previous) > 5) setShowContact(false);
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1667,9 +1588,48 @@ export default function App() {
            <SystemViewer />
            <MaterialSeries />
            <Validation />
-           <DeploymentCTA />
+           <DeploymentCTA onOpenContact={() => setShowContact(true)} showContact={showContact} />
          </main>
       </div>
+
+      {/* ---- Contact Form Modal — Root Level (escapes all masks/clips) ---- */}
+      <AnimatePresence>
+        {showContact && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={() => setShowContact(false)}
+              className="fixed inset-0 z-[9998] pointer-events-auto bg-gradient-to-t from-black/90 via-black/40 to-transparent cursor-pointer"
+              style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', maskImage: 'linear-gradient(to top, black 0%, transparent 80%)', WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 80%)' }}
+            />
+            <motion.div
+              initial={{ y: "120%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "120%", opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 35 }}
+              className="fixed bottom-4 md:bottom-8 left-4 right-4 md:left-8 md:right-8 z-[9999] pointer-events-none max-w-[85rem] mx-auto"
+            >
+              <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] px-6 md:px-10 py-8 md:py-10 border border-white/20 pointer-events-auto">
+                <button onClick={() => setShowContact(false)} className="absolute -top-4 -right-4 md:-top-5 md:-right-5 z-[100] w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0c0c0c] text-white flex items-center justify-center shadow-2xl hover:bg-[#1a1a1a] transition-colors border border-white/10 hover:scale-105 cursor-pointer">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 1L13 13M1 13L13 1"/></svg>
+                </button>
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
+                  <div className="shrink-0"><h3 className="text-2xl md:text-3xl font-black text-[#0c0c0c] tracking-tight">{t('contact')}</h3></div>
+                  <form onSubmit={(e) => { e.preventDefault(); setShowContact(false); }} className="flex-1 w-full flex flex-col md:flex-row items-stretch gap-4 md:gap-0">
+                    <div className="flex-1 flex flex-col md:flex-row">
+                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10"><label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_name')}</label><input type="text" placeholder="Type..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" /></div>
+                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10"><label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_email')}</label><input type="email" placeholder="Email..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" /></div>
+                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10"><label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_org')}</label><input type="text" placeholder="Company..." className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" /></div>
+                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0"><label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_msg')}</label><input type="text" placeholder="Your inquiry..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" /></div>
+                    </div>
+                    <button type="submit" className="shrink-0 w-full md:w-12 h-12 rounded-full bg-[#0c0c0c] text-white flex items-center justify-center hover:bg-[#1a1a1a] transition-colors shadow-lg md:ml-4 mt-3 md:mt-0 cursor-pointer"><ChevronRight className="w-5 h-5" /></button>
+                  </form>
+                </div>
+                <div className="mt-5 flex items-center gap-2 text-[10px] text-[#0c0c0c]/30 font-medium uppercase tracking-widest"><div className="w-3 h-3 rounded-full border border-[#0c0c0c]/20" />By submitting, you agree to our privacy policy</div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
