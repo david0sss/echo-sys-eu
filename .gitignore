@@ -7,5 +7,5 @@ coverage/
 .env*
 !.env.example
 
-# Dev-only tooling output (generated file, not tracked)
-dev-tools/untranslated.txt
+# Dev-only tooling — entire directory excluded from production tracking
+dev-tools/
