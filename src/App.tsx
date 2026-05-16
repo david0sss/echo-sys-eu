@@ -357,25 +357,31 @@ const TopNav = () => {
               <img
                 src="/images/logo-main.svg"
                 alt="ECHO SYSTEMS"
-                className="w-6 h-6 object-contain"
+                className="w-6 h-6 object-contain brightness-0 invert"
                 loading="eager"
               />
-              <span className="font-bold tracking-widest text-sm hidden sm:block">ECHO SYSTEMS</span>
             </div>
             <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-[10px] lg:text-xs font-bold tracking-widest uppercase opacity-70">
-              <button onClick={() => scrollTo('section-systems')} className="hover:text-white transition-colors">{t('sys')}</button>
-              <button onClick={() => scrollTo('section-engineering')} className="hover:text-white transition-colors">{t('eng')}</button>
+              <button onClick={() => scrollTo('section-systems')} className="hover:text-white transition-colors">{t('eng')}</button>
               <button onClick={() => scrollTo('section-about')} className="hover:text-white transition-colors">{t('abt')}</button>
-              <button onClick={toggleGlass} className={`flex items-center gap-1.5 transition-colors border-l border-white/10 pl-4 lg:pl-6 ml-1 lg:ml-2 ${glassEnabled ? 'text-emerald-400 hover:text-emerald-300' : 'text-white/40 hover:text-white'}`}>
-                <Sparkles className="w-3.5 h-3.5" />
+            </nav>
+            <div className="flex items-center gap-2 lg:gap-3">
+              {/* Pulsing status dot */}
+              <div className="hidden xl:flex items-center pr-2 border-r border-white/10">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div>
+              </div>
+              {/* FX Toggle — isolated glass bubble */}
+              <button
+                onClick={toggleGlass}
+                className={`hidden md:flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase transition-all backdrop-blur-md border ${
+                  glassEnabled
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                    : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Sparkles className="w-3 h-3" />
                 <span>{glassEnabled ? 'FX ON' : 'FX OFF'}</span>
               </button>
-            </nav>
-            <div className="flex items-center gap-2 lg:gap-4">
-              <div className="hidden xl:flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-white/50 border-r border-white/10 pr-4">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div>
-                {t('secure')}
-              </div>
               <SystemButton label={t('quote')} onClick={() => { document.getElementById('contact-form')?.scrollIntoView({behavior: 'smooth'}); setMobileOpen(false); }} />
               <LanguageSwitcher />
               {/* Hamburger — mobile only */}
@@ -412,8 +418,7 @@ const TopNav = () => {
                 <div className="p-4 flex flex-col gap-1">
                   {/* Nav links */}
                   {[
-                    { label: t('sys'), id: 'section-systems' },
-                    { label: t('eng'), id: 'section-engineering' },
+                    { label: t('eng'), id: 'section-systems' },
                     { label: t('abt'), id: 'section-about' },
                   ].map(link => (
                     <button
@@ -501,7 +506,7 @@ const Hero = () => {
        transition={{ duration: 1, delay: 0.4 }}
        className="mt-12 flex flex-col sm:flex-row gap-4 items-center justify-center z-10"
     >
-      <SystemButton label={t('deploy')} />
+      <SystemButton label={t('deploy')} onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })} />
       <button onClick={() => document.getElementById('section-A')?.scrollIntoView({behavior: 'smooth'})} className="px-8 py-3 rounded-full border border-white/10 hover:border-white/30 text-xs font-bold uppercase tracking-widest text-white/70 hover:text-white transition-all hover:bg-white/5">
         {t('explore')}
       </button>
@@ -890,9 +895,15 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                 </div>
 
                 <div className="flex items-center gap-4 mt-3 lg:mt-6">
-                  <a href={`#model-${section.id.toLowerCase()}-${activeStep}`} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold uppercase tracking-widest">
+                  <button
+                    onClick={() => {
+                      const nextIds = ['section-B', 'section-C', 'section-about'];
+                      document.getElementById(nextIds[idx] ?? 'section-about')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold uppercase tracking-widest"
+                  >
                     {t('learn_more')} <ChevronRight className="w-4 h-4" />
-                  </a>
+                  </button>
                 </div>
 
               </div>
