@@ -279,7 +279,8 @@ const Hero = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="text-[clamp(3rem,6vw,8rem)] font-black leading-[0.9] tracking-tighter relative z-10 w-full"
+      className="text-[clamp(2rem,6vw,8rem)] font-black leading-[0.95] tracking-tighter relative z-10 w-full"
+      style={{ wordBreak: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}
     >
       <span className="block text-white">{t('hero_title1')}</span>
       <span className="block animate-shiny">
@@ -423,14 +424,14 @@ const SystemViewer = () => {
 
   const allItems: any[] = [
     { id: 'ABOUT-2026', name: t('about_name'), isAbout: true, material: '', desc: t('about_desc') },
-    { id: 'ECM-PS-2026',  name: t('conc_ps_short'), targetId: 'A', image: "/images/series-a-1.webp", material: '', desc: t('conc_ps_desc'),         noStats: true },
-    { id: 'ECM-RES-2026', name: t('step_a2_s'),     targetId: 'A', image: "/images/series-a-2.webp", material: '', desc: t('conc_res_viewer_desc'),  noStats: true },
-    { id: 'ECM-IND-2026', name: t('conc_ind_short'),targetId: 'A', image: "/images/series-a-3.webp", material: '', desc: t('conc_ind_desc'),         noStats: true },
-    { id: 'ESM-B1-2026',  name: t('step_b1_s'),     targetId: 'B', image: "/images/series-b-1.webp", material: '', desc: t('steel_b1_viewer_desc'),  noStats: true },
-    { id: 'ESM-B2-2026',  name: t('step_b2_s'),     targetId: 'B', image: "/images/series-b-2.webp", material: '', desc: t('step_b2_d'),             noStats: true },
-    { id: 'ESM-B3-2026',  name: t('step_b3_s'),     targetId: 'B', image: "/images/series-b-3.webp", material: '', desc: t('step_b3_d'),             noStats: true },
-    { id: 'EP-MIL-2026',  name: t('pipe_mil_short'), targetId: 'C', image: "/images/series-c-1.webp", material: '', desc: t('pipe_mil_desc'),          noStats: true },
-    { id: 'EP-CIV-2026',  name: t('pipe_civ_short'), targetId: 'C', image: "/images/series-c-2.webp", material: '', desc: t('pipe_civ_desc'),          noStats: true },
+    { id: 'ECM-PS-2026',  name: t('conc_ps_short'), targetId: 'A', stepIndex: 0, totalSteps: 3, image: "/images/series-a-1.webp", material: '', desc: t('conc_ps_desc'),         noStats: true },
+    { id: 'ECM-RES-2026', name: t('step_a2_s'),     targetId: 'A', stepIndex: 1, totalSteps: 3, image: "/images/series-a-2.webp", material: '', desc: t('conc_res_viewer_desc'),  noStats: true },
+    { id: 'ECM-IND-2026', name: t('conc_ind_short'),targetId: 'A', stepIndex: 2, totalSteps: 3, image: "/images/series-a-3.webp", material: '', desc: t('conc_ind_desc'),         noStats: true },
+    { id: 'ESM-B1-2026',  name: t('step_b1_s'),     targetId: 'B', stepIndex: 0, totalSteps: 3, image: "/images/series-b-1.webp", material: '', desc: t('steel_b1_viewer_desc'),  noStats: true },
+    { id: 'ESM-B2-2026',  name: t('step_b2_s'),     targetId: 'B', stepIndex: 1, totalSteps: 3, image: "/images/series-b-2.webp", material: '', desc: t('step_b2_d'),             noStats: true },
+    { id: 'ESM-B3-2026',  name: t('step_b3_s'),     targetId: 'B', stepIndex: 2, totalSteps: 3, image: "/images/series-b-3.webp", material: '', desc: t('step_b3_d'),             noStats: true },
+    { id: 'EP-MIL-2026',  name: t('pipe_mil_short'), targetId: 'C', stepIndex: 0, totalSteps: 2, image: "/images/series-c-1.webp", material: '', desc: t('pipe_mil_desc'),          noStats: true },
+    { id: 'EP-CIV-2026',  name: t('pipe_civ_short'), targetId: 'C', stepIndex: 1, totalSteps: 2, image: "/images/series-c-2.webp", material: '', desc: t('pipe_civ_desc'),          noStats: true },
   ];
 
   const groups: any[] = [
@@ -461,10 +462,31 @@ const SystemViewer = () => {
     });
   };
 
+  const scrollToStep = (targetId: string, stepIndex: number, totalSteps: number) => {
+    const sectionEl = document.getElementById(`section-${targetId}`);
+    if (!sectionEl) return;
+    const sectionTop = sectionEl.getBoundingClientRect().top + window.scrollY;
+    // useScroll offset ["start start","end end"] → progress goes 0→1
+    // over a scroll range of (totalSteps - 1) * windowHeight.
+    // step i activates at progress = i / totalSteps, so:
+    // targetScrollY = sectionTop + (i / totalSteps) * (totalSteps - 1) * windowHeight + buffer
+    const vh = window.innerHeight;
+    const scrollRange = (totalSteps - 1) * vh;
+    const stepFraction = stepIndex / totalSteps;
+    // Add 40% of one step's scroll range as a buffer so we land clearly inside the step
+    const stepScrollSize = scrollRange / totalSteps;
+    const targetScroll = sectionTop + stepFraction * scrollRange + stepScrollSize * 0.4;
+    window.scrollTo({ top: Math.round(targetScroll), behavior: 'smooth' });
+  };
+
   const handleScrollToTarget = (e: React.MouseEvent) => {
     if (activeSystem?.targetId) {
       e.stopPropagation();
-      document.getElementById(`section-${activeSystem.targetId}`)?.scrollIntoView({ behavior: 'smooth' });
+      if (activeSystem.stepIndex !== undefined) {
+        scrollToStep(activeSystem.targetId, activeSystem.stepIndex, activeSystem.totalSteps);
+      } else {
+        document.getElementById(`section-${activeSystem.targetId}`)?.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -518,7 +540,14 @@ const SystemViewer = () => {
                             {group.children.length > 0 ? group.children.map((child: any) => (
                               <div
                                 key={child.id}
-                                onClick={(e) => { e.stopPropagation(); setActiveItemId(child.id); }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveItemId(child.id);
+                                  const item = allItems.find(i => i.id === child.id);
+                                  if (item?.targetId && item.stepIndex !== undefined) {
+                                    setTimeout(() => scrollToStep(item.targetId, item.stepIndex, item.totalSteps), 50);
+                                  }
+                                }}
                                 className={`cursor-pointer flex items-center justify-between px-3 py-2.5 text-sm rounded-lg border transition-all ${activeItemId === child.id ? 'bg-white/10 border-white/20 text-white font-medium' : 'bg-transparent border-transparent opacity-60 hover:opacity-100 hover:bg-white/5'}`}
                               >
                                 <span className="truncate">{child.label}</span>
