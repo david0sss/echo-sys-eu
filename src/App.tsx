@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
+import { setLanguage, useLanguage, t } from "./translations";
 import LogoLoop from "./components/LogoLoop";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence, useMotionValue, useTransform, useSpring } from "motion/react";
 const LazyGlobe = lazy(() => import("./components/ui/globe").then(m => ({ default: m.Globe })));
@@ -18,242 +19,32 @@ const LogoMark = ({ className = "w-8 h-8" }: { className?: string }) => (
   </svg>
 );
 
-const translations: Record<string, Record<string, string>> = {
-  en: {
-    sys: "Systems", eng: "Engineering", abt: "About Us",
-    hero_title1: "CIVILIAN DEFENSE.", hero_title2: "REDEFINED.",
-    hero_desc: "Next-generation modular bunker systems designed in Poland and Ukraine. Battle-tested in extreme high-risk environments. 100% scalable for public and private deployment.",
-    deploy: "Deploy a System", explore: "Explore Tech Specs", quote: "Get a Quote", secure: "SECURE",
-    info_sys: "Information & Systems", corp_over: "Corporate Overview", sys_det: "System Details",
-    air_qual: "Air Quality & Filtration", shock: "Shockwave Resistance", struct: "Structural Displacement",
-    mfg_comp: "Manufacturing Compliance", sec_class: "Security Classification",
-    global_stds: "Global Standards", cert_det: "Certification Details",
-    lets_discuss: "Let's Discuss", sys_impact: "System Impact Test 2026",
-    learn_more: "Learn More", vid_t1: "Manufacturing facilities in Poland", vid_t2: "(EU production standards)", vid_t3: "and Ukraine", vid_t4: "(Advanced combat engineering and R&D).", vid_desc: "Tested in real-world high-risk conditions. Validated by technical impact reports and ISO compliance audits.",
-    step_a1_s: "Public & Bus Stops", step_a1_d: "Designed for high-traffic urban areas, providing immediate shelter against blast waves and shrapnel.", step_a2_s: "Residential", step_a2_d: "Fully functional protected living space. Integrated kitchen zone, sleeping quarters, and utility modules.", step_a3_s: "Heavy Industrial", step_a3_d: "B45/B60 High-Strength Concrete. Designed for extreme loads and direct hits. Compliant with European safety standards.",
-    class_a_l4: "Highest grade structure, capable of surviving direct kinetic impact and extreme continuous shockwaves.", class_a_l3: "Standard bunker configuration, suitable for underground installation in high-risk zones.", class_a_l2: "Residential scale module, provides essential protection against fallout and pressure.", class_a_s1: "Maximum protection. 48+ hours stay duration. Fully hermetic with sleep quarters. 300 kN/m² blast resistance and 1500x radiation shielding.", class_a_u1: "Basic protection against shrapnel and building collapse. Short stay (<24h). 10 kN/m² blast resistance.", class_a_u2: "Supplemental earth shielding. Medium stay without active exclusion zones. 60 kN/m² blast resistance and 100x radiation shielding.",
-    step_b1_s: "MDS Underground", step_b1_d: "Expansive multi-chamber underground bases. Secure, modular expansion possibilities to support large tactical teams.", step_b2_s: "MDS On Ground", step_b2_d: "Rapid-deployment surface bunkers for industrial hubs and estates. Immediate shrapnel and secondary blast protection.", step_b3_s: "Mobile Solution", step_b3_d: "Trailer-mounted or containerized armor living modules. Capable of being relocated in less than 24 hours.",
-    class_b_i: "Large scale deployment for factories or critical infrastructure. Connects multiple modules.", class_b_p: "Compact footprint for fast installation under private residential properties.", class_b_l3: "Extended stay modular setup with optional HVAC add-ons. 150 kN/m² deflection rating.", class_b_l2: "Standard deployment for industrial defense. Medium duration viability. 80 kN/m² resistance.", class_b_l1: "Quick-deploy surface splinter protection. Minimal groundwork required.",
-    step_c1_s: "Military Ops", step_c1_d: "Hardened pipe solutions for front-line deployment. Self-sustaining with auxiliary ops integration, EMP shielding, and advanced sensory arrays.", step_c2_s: "Civil / Public Support", step_c2_d: "Engineered specifically for dense urban integration. The curved geometry naturally deflects overpressure waves, providing maximum survivability.", class_c_s: "Bus stop and public transport shelter integration.", class_c_g: "Underground walkway or tunnel reinforcement.",
-    req: "Your Requirements", req_desc: "Whether you have a specific operational challenge or want to explore what ECHO Systems can deliver, our team is ready to engage.",
-    about_name: "ECHO Systems", about_short: "About Us", about_desc: "ECHO Systems (ECHO SYSTEMS Sp. z o.o.) is a Polish technology company headquartered in Toruń, specialising in the development of advanced autonomous, wireless, and robotic systems for professional and defence applications.\n\nFounded in 2022 and registered in Poland, we combine deep engineering expertise with a mission to deliver modular, reliable, and mission-ready solutions to clients who operate where failure is not an option.",
-    conc_name: "Reinforced Concrete Series", conc_short: "Concrete Modules", conc_mat: "B45/B60 High-Strength Concrete", conc_desc: "Heavy-duty protection, long-term survival capabilities with integrated kitchen/sleeping zones, and active seismic stability. Full CBRN Hermetic Sealing.", conc_def: "Full Spectrum",
-    steel_name: "Steel Modular Series", steel_short: "Steel Systems", steel_mat: "Alloy Steel with Tactical Anti-Corrosion Coating", steel_desc: "Focus on Speed and Mobility. Interlocking modular design allowing 48-72 hour assembly. Highly scalable for private and industrial use.", steel_def: "Ballistic",
-    pipe_name: "Echo Pipe", pipe_short: "Cylindrical Systems", pipe_mat: "Aerodynamic Blast-Deflection Alloy", pipe_desc: "Designed for urban public infrastructure, bus stops, and public galleries. Aerodynamic geometry for blast-wave deflection and superior debris impact resistance.", pipe_def: "Deflection",
-    series_a_title: "Heavy-Duty Reinforced Solutions", series_a_f1: "Airlock System", series_a_d1: "Dual-door decontamination entry", series_a_f2: "Hermetic Seal", series_a_d2: "CBRN pressure isolation", series_a_f3: "Life Support", series_a_d3: "Air scrubbing and water reserves",
-    series_b_title: "Rapid Deployment Steel", series_b_f1: "Modular Locks", series_b_d1: "Fast-clip structural joining", series_b_f2: "Anti-Corrosion", series_b_d2: "Multi-layer subterranean coating", series_b_f3: "Mobility", series_b_d3: "Standard container transport logic",
-    series_c_title: "Urban Deflection Pipe", series_c_f1: "Curved Deflection", series_c_d1: "Redirects shockwave energy", series_c_f2: "Public Utility", series_c_d2: "Integrates with city transit", series_c_f3: "Quick Access", series_c_d3: "Wide entry points for masses",
-    eu_cert: "EU-Certified Protection", legal_entity: "Legal Entity", address: "Address", inquiries: "For Inquiries", contact: "Contact", form_name: "Name", form_email: "Email", form_org: "Organisation", form_msg: "Message",
-    spec_cap: "Capacity", spec_rat: "Rating", spec_mass: "Mass", spec_hvac: "HVAC", spec_dur: "Duration", spec_depth: "Depth", spec_walls: "Walls", spec_blast: "Blast Res",
-    spec_asm: "Assembly", spec_core: "Core", spec_arch: "Arch", spec_defl: "Deflection", spec_mob: "Mobility", spec_res: "Resilience", spec_pow: "Power", spec_fire: "Fire Rate",
-    spec_dim: "Dimension", spec_owall: "Outer Wall", spec_icore: "Inner Core",
-    val_p2050: "20-50 People", val_u1u2: "U1-U2 Surface", val_t45: "~45 Tons", val_pass: "Passive",
-    val_p412: "4-12 People", val_h48: "48+ Hours", val_d48: "4m-8m Avg", val_act: "Active CBRN",
-    val_t100: "100+ Tons", val_s3: "S3 Undrgrnd", val_w600: "600mm Wall", val_b300: "300 kN/m²",
-    val_w12: "1-2 Weeks", val_t15: "~15 Tons", val_c30: "≥ 30mm Alloy", val_ilock: "Interlocking",
-    val_h4872: "48-72 Hrs", val_d150: "150 kN/m²", val_p515: "5-15 People", val_dmode: "Dual Mode",
-    val_mhigh: "High (ISO Box)", val_t10: "< 10 Tons", val_sarm: "Spaced Armor", val_l1: "L1 Rapid",
-    val_r60: "60 kN/m²", val_sol: "Solar+Gen", val_s1025: "10-25 Squad", val_rei120: "REI 120",
-    val_dim: "7.3 x 2.8m", val_t90: "~90 Tons", val_w380: "380mm", val_m4: "4mm Metal",
-    feat_a1_t: "Structural Integrity", feat_a1_d: "Highest grade structure capable of surviving kinetic impact.",
-    feat_a2_t: "Living Ecology", feat_a2_d: "Fully functional protected living space. Integrated kitchen zone, quarters, and utility modules. Independent HVAC.",
-    feat_a3_t: "Defense Engineering", feat_a3_d: "Seismic-resistant base design. Hermetic CBRN filtration systems. Verified by impact reports.",
-    feat_b1_t: "Material Science", feat_b1_d: "High-grade alloy steel with tactical anti-corrosion coating. Ballistic-grade plating for maximum kinetic energy absorption.",
-    feat_b2_t: "Rapid Deployment", feat_b2_d: "Modular interlocking technology. Precision manufacturing allows assembly within 48-72 hours.",
-    feat_b3_t: "Versatility", feat_b3_d: "Scalable architecture. Ideal for tactical headquarters, industrial hub protection, or private estate security.",
-    feat_c1_t: "Geometry of Safety", feat_c1_d: "Echo Pipe geometry optimized for blast-wave deflection and pressure distribution. Withstands secondary debris.",
-    feat_c2_t: "Public Integration", feat_c2_d: "Dual-purpose urban infrastructure. Designed for bus stations, kiosks, and pavilions. Modern aesthetic.",
-    feat_c3_t: "Smart Connectivity", feat_c3_d: "Integrated communication modules, armored sensors, and automated emergency lighting.",
-    class_c_u3_d: "Up to 60 kN/m² resistance, REI 120 fire rating. Includes gravitational or mechanical air filtration and 100x radiation reduction.",
-    class_c_u12_d: "Up to 10 kN/m² resistance, REI 60 fire rating. Passive ventilation and basic debris management.",
-    class_c_aux_d: "Equipped with solar autonomy, integrated payment/vending systems for dual-use city infrastructure."
 
-  },
-  pl: {
-    sys: "Systemy", eng: "Inżynieria", abt: "O nas",
-    hero_title1: "OCHRONA LUDNOŚCI.", hero_title2: "ZDEFINIOWANA NA NOWO.",
-    hero_desc: "Modułowe systemy schronów nowej generacji zaprojektowane w Polsce i Ukrainie. Przetestowane w ekstremalnych środowiskach wysokiego ryzyka. W 100% skalowalne.",
-    deploy: "Wdróż system", explore: "Specyfikacje", quote: "Wyceń projekt", secure: "BEZPIECZNY",
-    info_sys: "Informacje i Systemy", corp_over: "Przegląd Firmy", sys_det: "Szczegóły Systemu",
-    air_qual: "Jakość i Filtracja Powietrza", shock: "Odporność na Falę Uderzeniową", struct: "Przemieszczenie Konstrukcji",
-    mfg_comp: "Zgodność Produkcyjna", sec_class: "Klasyfikacja Bezpieczeństwa",
-    global_stds: "Globalne Standardy", cert_det: "Szczegóły Certyfikacji",
-    lets_discuss: "Porozmawiajmy", sys_impact: "Test Uderzeniowy 2026",
-    learn_more: "Dowiedz się więcej", vid_t1: "Zakłady produkcyjne w Polsce", vid_t2: "(Standardy UE)", vid_t3: "i na Ukrainie", vid_t4: "(Zaawansowana inżynieria bojowa i B&R).", vid_desc: "Testowane w rzeczywistych warunkach wysokiego ryzyka. Potwierdzone raportami i audytami ISO.",
-    step_a1_s: "Przystanki Publiczne", step_a1_d: "Zaprojektowane dla obszarów miejskich o dużym natężeniu ruchu, zapewniają natychmiastowe schronienie.", step_a2_s: "Mieszkalne", step_a2_d: "W pełni funkcjonalna chroniona przestrzeń życiowa. Zintegrowana kuchnia, strefa sypialna i moduły użytkowe.", step_a3_s: "Ciężki Przemysł", step_a3_d: "Beton o wysokiej wytrzymałości B45/B60. Przeznaczone na ekstremalne obciążenia i bezpośrednie trafienia.",
-    class_a_l4: "Struktura najwyższej klasy, zdolna przetrwać bezpośrednie uderzenie kinetyczne.", class_a_l3: "Standardowa konfiguracja bunkra, odpowiednia do instalacji podziemnych w strefach wysokiego ryzyka.", class_a_l2: "Moduł skali mieszkalnej, zapewnia podstawową ochronę przed opadem i ciśnieniem.", class_a_s1: "Maksymalna ochrona. Ponad 48h pobytu. W pełni hermetyczne z sypialniami. Odporność 300 kN/m².", class_a_u1: "Podstawowa ochrona przed odłamkami i zawaleniem budynków. Krótki pobyt (<24h). Odporność 10 kN/m².", class_a_u2: "Dodatkowa osłona z ziemi. Średni pobyt bez aktywnych stref wykluczenia. Odporność 60 kN/m².",
-    step_b1_s: "MDS Podziemny", step_b1_d: "Rozległe wielokomorowe bazy podziemne. Bezpieczne i modułowe rozszerzenia.", step_b2_s: "MDS Naziemny", step_b2_d: "Bunkry powierzchniowe szybkiego wdrażania dla węzłów przemysłowych. Natychmiastowa ochrona przed odłamkami.", step_b3_s: "Rozwiązanie Mobilne", step_b3_d: "Opancerzone moduły mieszkalne na przyczepach lub w kontenerach. Możliwość relokacji w 24h.",
-    class_b_i: "Wdrożenie na dużą skalę dla fabryk i infrastruktury krytycznej. Łączy wiele modułów.", class_b_p: "Kompaktowa budowa do szybkiej instalacji pod prywatnymi nieruchomościami.", class_b_l3: "Przedłużony pobyt z modułowymi dodatkami HVAC. Odporność 150 kN/m².", class_b_l2: "Standardowe wdrożenie do obrony przemysłowej. Odporność 80 kN/m².", class_b_l1: "Powierzchniowa osłona przed odłamkami szybkiego wdrożenia. Minimalne prace ziemne.",
-    step_c1_s: "Operacje Wojskowe", step_c1_d: "Wzmocnione rury do wdrażania na linii frontu. Samowystarczalne z integracją operacji pomocniczych.", step_c2_s: "Wsparcie Cywilne / Publiczne", step_c2_d: "Zaprojektowane do integracji w gęstej zabudowie miejskiej. Zakrzywiona geometria naturalnie odchyla fale ciśnienia.", class_c_s: "Integracja z przystankami i transportem publicznym.", class_c_g: "Wzmocnienie przejść podziemnych i tuneli.",
-    req: "O Twoich Wymaganiach", req_desc: "Niezależnie od tego, czy masz konkretne wyzwanie operacyjne, czy chcesz poznać możliwości ECHO Systems, nasz zespół jest gotowy do działania.",
-    about_name: "ECHO Systems", about_short: "O nas", about_desc: "ECHO Systems (ECHO SYSTEMS Sp. z o.o.) to polska firma technologiczna z siedzibą w Toruniu, specjalizująca się w rozwoju zaawansowanych systemów do zastosowań profesjonalnych i obronnych.\n\nZałożona w 2022 roku łączymy głęboką wiedzę inżynieryjną z misją dostarczania niezawodnych rozwiązań dla klientów.",
-    conc_name: "Seria Żelbetowa", conc_short: "Moduły Betonowe", conc_mat: "Beton o Wysokiej Wytrzymałości B45/B60", conc_desc: "Wzmocniona ochrona, zdolność do długotrwałego przetrwania ze strefą sypialną oraz aktywna stabilność sejsmiczna. Pełne uszczelnienie CBRN.", conc_def: "Pełne Spektrum",
-    steel_name: "Seria Stalowa Modułowa", steel_short: "Systemy Stalowe", steel_mat: "Stal Stopowa z Powłoką Antykorozyjną", steel_desc: "Skupienie na szybkości i mobilności. Zazębiająca się konstrukcja modułowa pozwalająca na montaż w 48-72 h. Wysoce skalowalna.", steel_def: "Balistyczna",
-    pipe_name: "Echo Pipe", pipe_short: "Systemy Cylindryczne", pipe_mat: "Aerodynamiczny Stop Odbijający", pipe_desc: "Zaprojektowane dla miejskiej infrastruktury publicznej i przystanków. Aerodynamiczna geometria odchylająca falę uderzeniową.", pipe_def: "Odbicie",
-    series_a_title: "Wzmocnione Rozwiązania", series_a_f1: "System Śluzy", series_a_d1: "Wejście dwudrzwiowe", series_a_f2: "Uszczelnienie", series_a_d2: "Izolacja ciśnieniowa CBRN", series_a_f3: "Podtrzymanie Życia", series_a_d3: "Filtry powietrza i wody",
-    series_b_title: "Stal Szybkiego Wdrażania", series_b_f1: "Zamki Modułowe", series_b_d1: "Szybkie łączenie konstrukcji", series_b_f2: "Antykorozyjność", series_b_d2: "Wielowarstwowa powłoka", series_b_f3: "Mobilność", series_b_d3: "Standardowy transport",
-    series_c_title: "Rura Odbijająca", series_c_f1: "Zakrzywione Odbicie", series_c_d1: "Przekierowuje energię fali", series_c_f2: "Użyteczność Pub.", series_c_d2: "Integracja z miastem", series_c_f3: "Szybki Dostęp", series_c_d3: "Szerokie wejścia dla tłumów",
-    eu_cert: "Ochrona certyfikowana w UE", legal_entity: "Osobowość Prawna", address: "Adres", inquiries: "Dla Zapytań", contact: "Kontakt", form_name: "Imię i Nazwisko", form_email: "Email", form_org: "Organizacja", form_msg: "Wiadomość",
-    spec_cap: "Pojemność", spec_rat: "Klasa", spec_mass: "Masa", spec_hvac: "HVAC", spec_dur: "Czas", spec_depth: "Głębokość", spec_walls: "Ściany", spec_blast: "Odporność",
-    spec_asm: "Montaż", spec_core: "Rdzeń", spec_arch: "Struktura", spec_defl: "Ugięcie", spec_mob: "Mobilność", spec_res: "Wytrzymałość", spec_pow: "Zasilanie", spec_fire: "Ognioodporność",
-    spec_dim: "Wymiary", spec_owall: "Ściana Zew.", spec_icore: "Rdzeń Wew.",
-    val_p2050: "20-50 Osób", val_u1u2: "U1-U2 Powierzchnia", val_t45: "~45 Ton", val_pass: "Pasywne",
-    val_p412: "4-12 Osób", val_h48: "48+ Godzin", val_d48: "4m-8m Średnio", val_act: "Aktywne CBRN",
-    val_t100: "100+ Ton", val_s3: "S3 Podziemie", val_w600: "600mm Ściana", val_b300: "300 kN/m²",
-    val_w12: "1-2 Tygodnie", val_t15: "~15 Ton", val_c30: "≥ 30mm Stop", val_ilock: "Zazębiająca",
-    val_h4872: "48-72 Godzin", val_d150: "150 kN/m²", val_p515: "5-15 Osób", val_dmode: "Podwójny Tryb",
-    val_mhigh: "Wysoka (ISO)", val_t10: "< 10 Ton", val_sarm: "Pancerz z Odstępem", val_l1: "L1 Szybka",
-    val_r60: "60 kN/m²", val_sol: "Solar+Gen", val_s1025: "10-25 Oddział", val_rei120: "REI 120",
-    val_dim: "7.3 x 2.8m", val_t90: "~90 Ton", val_w380: "380mm", val_m4: "4mm Metal",
-    feat_a1_t: "Integracja Strukturalna", feat_a1_d: "Konstrukcja najwyższej klasy zdolna przetrwać bezpośrednie trafienie.",
-    feat_a2_t: "Ekologia Życia", feat_a2_d: "W pełni funkcjonalna chroniona przestrzeń. Zintegrowana kuchnia i sypialnie. Niezależny HVAC.",
-    feat_a3_t: "Inżynieria Obronna", feat_a3_d: "Konstrukcja odporna na wstrząsy sejsmiczne. Hermetyczne systemy filtracji CBRN.",
-    feat_b1_t: "Inżynieria Materiałowa", feat_b1_d: "Wysokiej klasy stal stopowa z powłoką antykorozyjną. Płyty balistyczne.",
-    feat_b2_t: "Szybkie Wdrażanie", feat_b2_d: "Zazębiająca się technologia modułowa. Montaż w 48-72 godziny.",
-    feat_b3_t: "Wszechstronność", feat_b3_d: "Skalowalna architektura. Idealna do ochrony kwater wojskowych czy fabryk.",
-    feat_c1_t: "Geometria Bezpieczeństwa", feat_c1_d: "Geometria Echo Pipe zoptymalizowana do odchylania fal wybuchowych.",
-    feat_c2_t: "Integracja Publiczna", feat_c2_d: "Infrastruktura podwójnego przeznaczenia. Przystanki autobusowe, kioski.",
-    feat_c3_t: "Inteligentna Łączność", feat_c3_d: "Zintegrowane moduły komunikacyjne i opancerzone czujniki.",
-    class_c_u3_d: "Odporność do 60 kN/m², ognioodporność REI 120. Mechaniczna filtracja powietrza.",
-    class_c_u12_d: "Odporność do 10 kN/m², ognioodporność REI 60. Pasywna wentylacja.",
-    class_c_aux_d: "Autonomia solarna, zintegrowane systemy vendingowe do infrastruktury miejskiej."
-
-  },
-  uk: {
-    sys: "Системи", eng: "Інженерія", abt: "Про нас",
-    hero_title1: "ЦИВІЛЬНИЙ ЗАХИСТ.", hero_title2: "НОВИЙ СТАНДАРТ.",
-    hero_desc: "Модульні укриття нового покоління, розроблені в Польщі та Україні. Протестовані в умовах екстремального ризику. 100% масштабованість для публічного та приватного використання.",
-    deploy: "Розгорнути", explore: "Тех. Характеристики", quote: "Отримати ціну", secure: "БЕЗПЕЧНО",
-    info_sys: "Інформація та Системи", corp_over: "Огляд Компанії", sys_det: "Деталі Системи",
-    air_qual: "Якість та Фільтрація", shock: "Стійкість до Хвилі", struct: "Структурне Зміщення",
-    mfg_comp: "Виробнича Відповідність", sec_class: "Класифікація Безпеки",
-    global_stds: "Глобальні Стандарти", cert_det: "Деталі Сертифікації",
-    lets_discuss: "Обговоримо", sys_impact: "Ударне Тестування 2026",
-    learn_more: "Дізнатися більше", vid_t1: "Виробничі потужності в Польщі", vid_t2: "(стандарти ЄС)", vid_t3: "та Україні", vid_t4: "(Передові бойові розробки).", vid_desc: "Протестовано в реальних умовах високого ризику. Підтверджено звітами та аудитами ISO.",
-    step_a1_s: "Громадські Зупинки", step_a1_d: "Розроблено для міських районів з інтенсивним рухом, забезпечує негайне укриття від вибухових хвиль.", step_a2_s: "Житлові", step_a2_d: "Повністю функціональний захищений житловий простір. Інтегрована кухня та спальні місця.", step_a3_s: "Важка Промисловість", step_a3_d: "Бетон високої міцності B45/B60. Розрахований на екстремальні навантаження та прямі попадання.",
-    class_a_l4: "Конструкція найвищого класу, здатна витримати пряме кінетичне попадання.", class_a_l3: "Стандартна конфігурація бункера, придатна для підземного встановлення в зонах високого ризику.", class_a_l2: "Житловий модуль, забезпечує базовий захист від опадів та тиску.", class_a_s1: "Максимальний захист. Більше 48 годин перебування. Повністю герметичний зі спальнями.", class_a_u1: "Базовий захист від уламків та руйнування будівель. Коротке перебування (<24г).", class_a_u2: "Додаткове екранування ґрунтом. Середнє перебування. Стійкість 60 кН/м².",
-    step_b1_s: "MDS Підземний", step_b1_d: "Широкі багатокамерні підземні бази. Безпечні модульні можливості розширення.", step_b2_s: "MDS Наземний", step_b2_d: "Наземні бункери швидкого розгортання для промислових центрів. Миттєвий захист від уламків.", step_b3_s: "Мобільне Рішення", step_b3_d: "Броньовані житлові модулі на причепах або в контейнерах. Можливість переміщення за 24г.",
-    class_b_i: "Масштабне розгортання для заводів або критичної інфраструктури. З'єднує багато модулів.", class_b_p: "Компактний розмір для швидкого встановлення під приватними будинками.", class_b_l3: "Тривале перебування з модульними доповненнями HVAC. Стійкість 150 кН/м².", class_b_l2: "Стандартне розгортання для промислової оборони. Стійкість 80 кН/m².", class_b_l1: "Швидке розгортання для захисту від уламків. Мінімальні земляні роботи.",
-    step_c1_s: "Військові Операції", step_c1_d: "Посилені труби для розміщення на передовій. Самодостатні з інтеграцією допоміжних систем.", step_c2_s: "Громадська Підтримка", step_c2_d: "Спеціально розроблено для інтеграції в щільну міську забудову. Геометрія відхиляє хвилі тиску.", class_c_s: "Інтеграція із зупинками громадського транспорту.", class_c_g: "Посилення підземних переходів та тунелів.",
-    req: "Ваші Вимоги", req_desc: "Незалежно від того, чи є у вас конкретні оперативні завдання, чи ви хочете дізнатися, що може запропонувати ECHO Systems, наша команда готова до співпраці.",
-    about_name: "ECHO Systems", about_short: "Про нас", about_desc: "ECHO Systems — польська технологічна компанія, що спеціалізується на розробці передових систем для професійного та оборонного застосування.\n\nМи поєднуємо глибокі інженерні знання з місією надавати надійні рішення клієнтам.",
-    conc_name: "Залізобетонна Серія", conc_short: "Бетонні Модулі", conc_mat: "Бетон B45/B60", conc_desc: "Надійний захист, довгострокове виживання з кухнею/спальнею та активною сейсмічною стабільністю. Повна герметизація CBRN.", conc_def: "Повний Спектр",
-    steel_name: "Сталева Модульна Серія", steel_short: "Сталеві Системи", steel_mat: "Сталь з антикорозійним покриттям", steel_desc: "Швидкість і мобільність. Модульна конструкція дозволяє зібрати укриття за 48-72 години. Висока масштабованість.", steel_def: "Балістичний",
-    pipe_name: "Echo Pipe", pipe_short: "Циліндричні Системи", pipe_mat: "Аеродинамічний Сплав", pipe_desc: "Розроблено для міської інфраструктури та зупинок. Аеродинамічна геометрія для відхилення вибухової хвилі.", pipe_def: "Відхилення",
-    series_a_title: "Надміцні Рішення", series_a_f1: "Система Шлюзів", series_a_d1: "Дводверний вхід", series_a_f2: "Герметичність", series_a_d2: "Ізоляція тиску CBRN", series_a_f3: "Підтримка Життя", series_a_d3: "Очищення повітря і води",
-    series_b_title: "Сталь Швидкого Розгортання", series_b_f1: "Модульні Замки", series_b_d1: "Швидке з'єднання", series_b_f2: "Антикорозія", series_b_d2: "Багатошарове покриття", series_b_f3: "Мобільність", series_b_d3: "Стандартний транспорт",
-    series_c_title: "Криволінійна Геометрія", series_c_f1: "Відхилення Хвилі", series_c_d1: "Перенаправляє енергію", series_c_f2: "Публічна Користь", series_c_d2: "Інтеграція з містом", series_c_f3: "Швидкий Доступ", series_c_d3: "Широкі входи для натовпу",
-    eu_cert: "Сертифікований захист ЄС", legal_entity: "Юридична Особа", address: "Адреса", inquiries: "Для запитів", contact: "Контакти", form_name: "Ім'я", form_email: "Email", form_org: "Організація", form_msg: "Повідомлення",
-    spec_cap: "Місткість", spec_rat: "Клас", spec_mass: "Маса", spec_hvac: "HVAC", spec_dur: "Тривалість", spec_depth: "Глибина", spec_walls: "Стіни", spec_blast: "Стійкість",
-    spec_asm: "Збірка", spec_core: "Ядро", spec_arch: "Структура", spec_defl: "Відхилення", spec_mob: "Мобільність", spec_res: "Міцність", spec_pow: "Живлення", spec_fire: "Вогнестійкість",
-    spec_dim: "Розміри", spec_owall: "Зовн. Стіна", spec_icore: "Внутр. Ядро",
-    val_p2050: "20-50 Осіб", val_u1u2: "U1-U2 Поверхня", val_t45: "~45 Тонн", val_pass: "Пасивна",
-    val_p412: "4-12 Осіб", val_h48: "48+ Годин", val_d48: "4m-8m Середня", val_act: "Активна CBRN",
-    val_t100: "100+ Тонн", val_s3: "S3 Підземна", val_w600: "600мм Стіна", val_b300: "300 кН/м²",
-    val_w12: "1-2 Тижні", val_t15: "~15 Тонн", val_c30: "≥ 30мм Сплав", val_ilock: "Блокова",
-    val_h4872: "48-72 Годин", val_d150: "150 кН/м²", val_p515: "5-15 Осіб", val_dmode: "Два Режими",
-    val_mhigh: "Висока (ISO)", val_t10: "< 10 Тонн", val_sarm: "Просторова Броня", val_l1: "L1 Швидка",
-    val_r60: "60 кН/m²", val_sol: "Solar+Gen", val_s1025: "10-25 Загін", val_rei120: "REI 120",
-    val_dim: "7.3 x 2.8m", val_t90: "~90 Тонн", val_w380: "380мм", val_m4: "4мм Метал",
-    feat_a1_t: "Структурна Цілісність", feat_a1_d: "Конструкція найвищого класу, здатна витримати кінетичний удар.",
-    feat_a2_t: "Екологія Життя", feat_a2_d: "Повністю функціональний захищений простір. Інтегрована кухня. Незалежний HVAC.",
-    feat_a3_t: "Оборонна Інженерія", feat_a3_d: "Сейсмостійкий дизайн. Герметичні системи CBRN фільтрації.",
-    feat_b1_t: "Матеріалознавство", feat_b1_d: "Високоякісна легована сталь з антикорозійним покриттям.",
-    feat_b2_t: "Швидке Розгортання", feat_b2_d: "Модульна технологія. Точне виробництво дозволяє збірку за 48-72 години.",
-    feat_b3_t: "Універсальність", feat_b3_d: "Масштабована архітектура. Ідеально для тактичних штабів або заводів.",
-    feat_c1_t: "Геометрія Безпеки", feat_c1_d: "Геометрія труби оптимізована для відхилення вибухової хвилі.",
-    feat_c2_t: "Громадська Інтеграція", feat_c2_d: "Міська інфраструктура подвійного призначення (зупинки, кіоски).",
-    feat_c3_t: "Розумний Зв'язок", feat_c3_d: "Інтегровані модулі зв'язку та броньовані датчики.",
-    class_c_u3_d: "Стійкість до 60 кН/м², вогнестійкість REI 120. Механічна фільтрація.",
-    class_c_u12_d: "Стійкість до 10 кН/м², вогнестійкість REI 60. Пасивна вентиляція.",
-    class_c_aux_d: "Сонячна автономія, інтегровані системи вендингу для міста."
-
-  },
-  nl: {
-    sys: "Systemen", eng: "Engineering", abt: "Over Ons",
-    hero_title1: "BURGERVERDEDIGING.", hero_title2: "HERDEFINIEERD.",
-    hero_desc: "Modulaire bunkersystemen van de volgende generatie. Getest in extreme omstandigheden. 100% schaalbaar voor publiek en privaat gebruik.",
-    deploy: "Systeem Inzetten", explore: "Bekijk Specificaties", quote: "Offerte Aanvragen", secure: "VEILIG",
-    info_sys: "Informatie & Systemen", corp_over: "Bedrijfsoverzicht", sys_det: "Systeemdetails",
-    air_qual: "Luchtkwaliteit & Filtratie", shock: "Schokgolf Weerstand", struct: "Structurele Verplaatsing",
-    mfg_comp: "Productie Naleving", sec_class: "Veiligheidsclassificatie",
-    global_stds: "Wereldwijde Normen", cert_det: "Certificeringsdetails",
-    lets_discuss: "Laten we praten", sys_impact: "Systeem Impact Test 2026",
-    learn_more: "Meer Informatie", vid_t1: "Productiefaciliteiten in Polen", vid_t2: "(EU normen)", vid_t3: "en Oekraïne", vid_t4: "(Geavanceerde gevechtstechniek en R&D).", vid_desc: "Getest in reële risicovolle omstandigheden. Gevalideerd door technische rapporten en ISO audits.",
-    step_a1_s: "Openbaar & Bushaltes", step_a1_d: "Ontworpen voor drukke stedelijke gebieden en biedt onmiddellijke beschutting tegen schokgolven en schrapnel.", step_a2_s: "Residentieel", step_a2_d: "Volledig functionele beschermde leefruimte. Geïntegreerde keuken, slaapvertrekken en nutsmodules.", step_a3_s: "Zware Industrie", step_a3_d: "B45/B60 Hogesterktebeton. Ontworpen voor extreme belastingen en directe inslagen.",
-    class_a_l4: "Constructie van de hoogste klasse, in staat om directe kinetische inslagen te overleven.", class_a_l3: "Standaard bunkerconfiguratie, geschikt voor ondergrondse installatie in hoogrisicozones.", class_a_l2: "Residentiële module, biedt essentiële bescherming tegen fall-out en druk.", class_a_s1: "Maximale bescherming. Meer dan 48 uur verblijf. Volledig hermetisch met slaapruimtes.", class_a_u1: "Basisbescherming tegen schrapnel en instortende gebouwen. Kort verblijf (<24u).", class_a_u2: "Extra aardschild. Middellang verblijf zonder actieve uitsluitingszones. 60 kN/m² weerstand.",
-    step_b1_s: "MDS Ondergronds", step_b1_d: "Uitgebreide ondergrondse bases met meerdere kamers. Veilige, modulaire uitbreidingsmogelijkheden.", step_b2_s: "MDS Bovengronds", step_b2_d: "Bovengrondse bunkers voor snelle inzet in industriële gebieden. Onmiddellijke bescherming tegen schrapnel.", step_b3_s: "Mobiele Oplossing", step_b3_d: "Gepantserde leefmodules op aanhangers of in containers. Verplaatsbaar in minder dan 24 uur.",
-    class_b_i: "Grootschalige inzet voor fabrieken of kritieke infrastructuur. Verbindt meerdere modules.", class_b_p: "Compact ontwerp voor snelle installatie onder particuliere woningen.", class_b_l3: "Langer verblijf met optionele HVAC add-ons. 150 kN/m² afbuigingsclassificatie.", class_b_l2: "Standaard inzet voor industriële defensie. Gemiddelde verblijfsduur. 80 kN/m² weerstand.", class_b_l1: "Snel inzetbare bovengrondse splinterbescherming. Minimaal grondwerk vereist.",
-    step_c1_s: "Militaire Operaties", step_c1_d: "Versterkte buizen voor frontlinie inzet. Zelfvoorzienend met integratie van hulpsystemen.", step_c2_s: "Publieke Ondersteuning", step_c2_d: "Speciaal ontworpen voor dichte stedelijke integratie. De gebogen geometrie buigt drukgolven af.", class_c_s: "Integratie met bushaltes en openbaar vervoer.", class_c_g: "Versterking van voetgangerstunnels en gangen.",
-    req: "Uw Vereisten", req_desc: "Of u nu een specifieke operationele uitdaging heeft of wilt ontdekken wat ECHO Systems kan leveren, ons team staat klaar om u te helpen.",
-    about_name: "ECHO Systems", about_short: "Over Ons", about_desc: "ECHO Systems is een Pools technologiebedrijf gespecialiseerd in de ontwikkeling van geavanceerde systemen voor defensietoepassingen.\n\nOpgericht in 2022, combineren wij technische expertise met de missie om betrouwbare oplossingen te leveren.",
-    conc_name: "Gewapend Beton Serie", conc_short: "Betonnen Modules", conc_mat: "B45/B60 Beton", conc_desc: "Zware bescherming, overlevingscapaciteiten met geïntegreerde zones en actieve seismische stabiliteit. Volledige CBRN afdichting.", conc_def: "Volledig Spectrum",
-    steel_name: "Stalen Modulaire Serie", steel_short: "Stalen Systemen", steel_mat: "Gelegeerd staal met coating", steel_desc: "Focus op snelheid en mobiliteit. In elkaar grijpend ontwerp voor montage in 48-72 uur. Zeer schaalbaar.", steel_def: "Ballistisch",
-    pipe_name: "Echo Pipe", pipe_short: "Cilindrische Systemen", pipe_mat: "Aerodynamische Legering", pipe_desc: "Ontworpen voor stedelijke infrastructuur. Aerodynamische geometrie voor afbuiging van schokgolven.", pipe_def: "Afbuiging",
-    series_a_title: "Zware Oplossingen", series_a_f1: "Luchtsluis", series_a_d1: "Tweedeurs ingang", series_a_f2: "Hermetische Afdichting", series_a_d2: "CBRN drukisolatie", series_a_f3: "Levensondersteuning", series_a_d3: "Lucht- en waterreserves",
-    series_b_title: "Snel inzetbaar Staal", series_b_f1: "Modulaire Sloten", series_b_d1: "Snelle structurele verbinding", series_b_f2: "Anti-Corrosie", series_b_d2: "Meerlaagse coating", series_b_f3: "Mobiliteit", series_b_d3: "Standaard transport",
-    series_c_title: "Stedelijke Afbuigbuis", series_c_f1: "Gebogen Afbuiging", series_c_d1: "Verlegt schokgolfenergie", series_c_f2: "Openbaar Nut", series_c_d2: "Integreert met stadstransit", series_c_f3: "Snelle Toegang", series_c_d3: "Brede toegangspunten",
-    eu_cert: "EU-Gecertificeerde Bescherming", legal_entity: "Juridische Entiteit", address: "Adres", inquiries: "Voor Aanvragen", contact: "Contact", form_name: "Naam", form_email: "E-mail", form_org: "Organisatie", form_msg: "Bericht",
-    spec_cap: "Capaciteit", spec_rat: "Klasse", spec_mass: "Massa", spec_hvac: "HVAC", spec_dur: "Duur", spec_depth: "Diepte", spec_walls: "Muren", spec_blast: "Weerstand",
-    spec_asm: "Montage", spec_core: "Kern", spec_arch: "Architectuur", spec_defl: "Afbuiging", spec_mob: "Mobiliteit", spec_res: "Veerkracht", spec_pow: "Stroom", spec_fire: "Brandklasse",
-    spec_dim: "Afmetingen", spec_owall: "Buitenmuur", spec_icore: "Binnenkern",
-    val_p2050: "20-50 Personen", val_u1u2: "U1-U2 Oppervlak", val_t45: "~45 Ton", val_pass: "Passief",
-    val_p412: "4-12 Personen", val_h48: "48+ Uur", val_d48: "4m-8m Gemiddeld", val_act: "Actieve CBRN",
-    val_t100: "100+ Ton", val_s3: "S3 Ondergronds", val_w600: "600mm Muur", val_b300: "300 kN/m²",
-    val_w12: "1-2 Weken", val_t15: "~15 Ton", val_c30: "≥ 30mm Legering", val_ilock: "In elkaar grijpend",
-    val_h4872: "48-72 Uur", val_d150: "150 kN/m²", val_p515: "5-15 Personen", val_dmode: "Dubbele Modus",
-    val_mhigh: "Hoog (ISO Box)", val_t10: "< 10 Ton", val_sarm: "Gepantserde Ruimte", val_l1: "L1 Snel",
-    val_r60: "60 kN/m²", val_sol: "Zon+Gen", val_s1025: "10-25 Team", val_rei120: "REI 120",
-    val_dim: "7.3 x 2.8m", val_t90: "~90 Ton", val_w380: "380mm", val_m4: "4mm Metaal",
-    feat_a1_t: "Structurele Integriteit", feat_a1_d: "Structuur van de hoogste klasse, bestand tegen kinetische impact.",
-    feat_a2_t: "Leef Ecologie", feat_a2_d: "Volledig functionele beschermde ruimte. Geïntegreerde keuken en onafhankelijke HVAC.",
-    feat_a3_t: "Defensie Engineering", feat_a3_d: "Seismisch-bestendig ontwerp. Hermetische CBRN filtratiesystemen.",
-    feat_b1_t: "Materiaalkunde", feat_b1_d: "Hoogwaardig gelegeerd staal met anti-corrosie coating. Ballistische platen.",
-    feat_b2_t: "Snelle Inzet", feat_b2_d: "Modulaire technologie. Assemblage binnen 48-72 uur.",
-    feat_b3_t: "Veelzijdigheid", feat_b3_d: "Schaalbare architectuur. Ideaal voor hoofdkwartieren of industrie.",
-    feat_c1_t: "Geometrie van Veiligheid", feat_c1_d: "Pijp geometrie geoptimaliseerd voor afbuiging van schokgolven.",
-    feat_c2_t: "Publieke Integratie", feat_c2_d: "Infrastructuur voor dubbel gebruik. Bushaltes, kiosken.",
-    feat_c3_t: "Slimme Connectiviteit", feat_c3_d: "Geïntegreerde communicatiemodules en gepantserde sensoren.",
-    class_c_u3_d: "Tot 60 kN/m² weerstand, REI 120. Inclusief luchtfiltratie.",
-    class_c_u12_d: "Tot 10 kN/m² weerstand, REI 60. Passieve ventilatie.",
-    class_c_aux_d: "Voorzien van zonne-energie en geïntegreerde systemen voor steden."
-
-  }
-};
-
-let activeLanguage = 'en';
-const languageListeners: Set<() => void> = new Set();
-export const setLanguage = (lang: string) => {
-  activeLanguage = lang;
-  languageListeners.forEach(l => l());
-};
-export const useLanguage = () => {
-  const [lang, setLang] = useState(activeLanguage);
-  useEffect(() => {
-    const l = () => setLang(activeLanguage);
-    languageListeners.add(l);
-    return () => { languageListeners.delete(l); };
-  }, []);
-  return lang;
-};
-
-const t = (key: string) => {
-  return translations[activeLanguage]?.[key] || translations['en'][key] || key;
-};
 
 const LanguageSwitcher = () => {
   const lang = useLanguage();
   const langs = ['en', 'pl', 'uk', 'nl'];
   return (
-    <div className="hidden lg:flex items-center bg-white/5 border border-white/10 rounded-full p-1 ml-2 shadow-lg backdrop-blur-md">
+    <div className="hidden lg:flex items-center bg-white/5 border border-white/10 rounded-full p-1 ml-2 shadow-lg backdrop-blur-md relative">
       {langs.map(l => (
-        <button 
-          key={l} 
+        <motion.button
+          key={l}
           onClick={() => setLanguage(l)}
-          className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all ${lang === l ? 'bg-white text-black' : 'text-white/40 hover:text-white'}`}
+          className={`relative px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full z-10 transition-colors ${lang === l ? 'text-black' : 'text-white/40 hover:text-white'}`}
+          whileHover={{ scale: lang === l ? 1 : 1.08 }}
+          whileTap={{ scale: 0.92 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         >
+          {lang === l && (
+            <motion.div
+              layoutId="langPill"
+              className="absolute inset-0 bg-white rounded-full"
+              style={{ zIndex: -1 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            />
+          )}
           {l}
-        </button>
+        </motion.button>
       ))}
     </div>
   );
@@ -429,17 +220,26 @@ const TopNav = () => {
                     </button>
 
                     {/* Inline language switcher */}
-                    <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1">
+                    <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1 relative">
                       {langs.map(l => (
-                        <button
+                        <motion.button
                           key={l}
                           onClick={() => setLanguage(l)}
-                          className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all ${
-                            lang === l ? 'bg-white text-black' : 'text-white/40 hover:text-white'
+                          className={`relative flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full z-10 transition-colors ${
+                            lang === l ? 'text-black' : 'text-white/40 hover:text-white'
                           }`}
+                          whileTap={{ scale: 0.92 }}
                         >
+                          {lang === l && (
+                            <motion.div
+                              layoutId="langPillMobile"
+                              className="absolute inset-0 bg-white rounded-full"
+                              style={{ zIndex: -1 }}
+                              transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                            />
+                          )}
                           {l}
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
                   </div>
@@ -503,7 +303,13 @@ const Hero = () => {
        className="mt-12 flex flex-col sm:flex-row gap-4 items-center justify-center z-10"
     >
       <SystemButton label={t('deploy')} onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })} />
-      <button onClick={() => document.getElementById('section-A')?.scrollIntoView({behavior: 'smooth'})} className="px-8 py-3 rounded-full border border-white/10 hover:border-white/30 text-xs font-bold uppercase tracking-widest text-white/70 hover:text-white transition-all hover:bg-white/5">
+      <button onClick={() => {
+        const el = document.getElementById('section-A');
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }} className="px-8 py-3 rounded-full border border-white/10 hover:border-white/30 text-xs font-bold uppercase tracking-widest text-white/70 hover:text-white transition-all hover:bg-white/5">
         {t('explore')}
       </button>
     </motion.div>
@@ -611,98 +417,130 @@ const TiltCard = ({ children, className, innerClassName = "grid grid-cols-1 md:g
 };
 
 const SystemViewer = () => {
-  const [activeTab, setActiveTab] = useState(0);
   const lang = useLanguage();
+  const [activeItemId, setActiveItemId] = useState<string>('ABOUT-2026');
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
 
-  const systems = [
-    {
-      id: 'ABOUT-2026',
-      name: t('about_name'),
-      short: t('about_short'),
-      isAbout: true,
-      material: '',
-      desc: t('about_desc'),
-    },
-    {
-      id: 'ECM-B60-2026',
-      name: t('conc_name'),
-      short: t('conc_short'),
-      targetId: 'A',
-      image: "/images/sys-concrete.webp",
-      material: t('conc_mat'),
-      desc: t('conc_desc'),
-      grade: 'L4/B-Grade',
-      defense: t('conc_def'),
-      air: 'CBRN Active',
-    },
-    {
-      id: 'ESM-A1-2026',
-      name: t('steel_name'),
-      short: t('steel_short'),
-      targetId: 'B',
-      image: "/images/sys-steel.webp",
-      material: t('steel_mat'),
-      desc: t('steel_desc'),
-      grade: 'L3/Rapid',
-      defense: t('steel_def'),
-      air: 'HEPA-14',
-    },
-    {
-      id: 'EP-URB-2026',
-      name: t('pipe_name'),
-      short: t('pipe_short'),
-      targetId: 'C',
-      image: "/images/sys-pipes.webp",
-      material: t('pipe_mat'),
-      desc: t('pipe_desc'),
-      grade: 'Urban',
-      defense: t('pipe_def'),
-      air: 'Passive/HEPA',
-    }
+  const allItems: any[] = [
+    { id: 'ABOUT-2026', name: t('about_name'), isAbout: true, material: '', desc: t('about_desc') },
+    { id: 'ECM-PS-2026',  name: t('conc_ps_short'), targetId: 'A', image: "/images/series-a-1.webp", material: '', desc: t('conc_ps_desc'),         noStats: true },
+    { id: 'ECM-RES-2026', name: t('step_a2_s'),     targetId: 'A', image: "/images/series-a-2.webp", material: '', desc: t('conc_res_viewer_desc'),  noStats: true },
+    { id: 'ECM-IND-2026', name: t('conc_ind_short'),targetId: 'A', image: "/images/series-a-3.webp", material: '', desc: t('conc_ind_desc'),         noStats: true },
+    { id: 'ESM-B1-2026',  name: t('step_b1_s'),     targetId: 'B', image: "/images/series-b-1.webp", material: '', desc: t('steel_b1_viewer_desc'),  noStats: true },
+    { id: 'ESM-B2-2026',  name: t('step_b2_s'),     targetId: 'B', image: "/images/series-b-2.webp", material: '', desc: t('step_b2_d'),             noStats: true },
+    { id: 'ESM-B3-2026',  name: t('step_b3_s'),     targetId: 'B', image: "/images/series-b-3.webp", material: '', desc: t('step_b3_d'),             noStats: true },
+    { id: 'EP-MIL-2026',  name: t('pipe_mil_short'), targetId: 'C', image: "/images/series-c-1.webp", material: '', desc: t('pipe_mil_desc'),          noStats: true },
+    { id: 'EP-CIV-2026',  name: t('pipe_civ_short'), targetId: 'C', image: "/images/series-c-2.webp", material: '', desc: t('pipe_civ_desc'),          noStats: true },
   ];
 
-  const activeSystem = systems[activeTab];
+  const groups: any[] = [
+    { type: 'item',   id: 'ABOUT-2026', label: t('about_short') },
+    { type: 'folder', id: 'CONCRETE',   label: t('conc_short'),  targetId: 'A', children: [
+        { id: 'ECM-PS-2026',  label: t('conc_ps_short') },
+        { id: 'ECM-RES-2026', label: t('step_a2_s')     },
+        { id: 'ECM-IND-2026', label: t('conc_ind_short')},
+    ]},
+    { type: 'folder', id: 'STEEL',     label: t('steel_short'), targetId: 'B', children: [
+        { id: 'ESM-B1-2026', label: t('step_b1_s') },
+        { id: 'ESM-B2-2026', label: t('step_b2_s') },
+        { id: 'ESM-B3-2026', label: t('step_b3_s') },
+    ]},
+    { type: 'folder', id: 'PIPES',     label: t('pipe_short'),  targetId: 'C', children: [
+        { id: 'EP-MIL-2026', label: t('pipe_mil_short') },
+        { id: 'EP-CIV-2026', label: t('pipe_civ_short') },
+    ]},
+  ];
+
+  const activeSystem = allItems.find(i => i.id === activeItemId) || allItems[0];
+
+  const toggleFolder = (id: string) => {
+    setExpandedFolders(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   const handleScrollToTarget = (e: React.MouseEvent) => {
-    if (activeSystem.targetId) {
+    if (activeSystem?.targetId) {
       e.stopPropagation();
-      const el = document.getElementById(`section-${activeSystem.targetId}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
+      document.getElementById(`section-${activeSystem.targetId}`)?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
     <section id="section-systems" className="relative px-6 lg:px-[50px] pt-12 pb-24 w-full max-w-[70rem] mx-auto z-30 -mt-16 sm:-mt-20 lg:-mt-32 xl:-mt-48">
-      <motion.div 
-        initial={{ opacity: 0, y: 50, filter: 'blur(10px)' }}
+      <motion.div
+        initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
         whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         viewport={{ once: false, amount: 0.3 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+        transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
       >
         <TiltCard intensity={8} distance={1000} onClick={handleScrollToTarget}>
           {/* Sidebar */}
           <aside className="md:col-span-4 border-b md:border-b-0 md:border-r border-white/5 p-6 flex flex-col gap-1 z-10 bg-black/60" style={{ transform: "translateZ(10px)" }}>
             <div className="text-[10px] uppercase tracking-widest opacity-40 font-bold mb-4 ml-2">{t('info_sys')}</div>
-            <div className="flex flex-col gap-2">
-              {systems.map((sys, i) => (
-                <div 
-                  key={sys.id} 
-                  onClick={(e) => { e.stopPropagation(); setActiveTab(i); }}
-                  className={`cursor-pointer flex items-center justify-between p-4 text-sm font-medium rounded-xl border transition-all ${activeTab === i ? 'bg-white/10 border-white/20 text-white shadow-lg' : 'bg-transparent border-transparent opacity-60 hover:opacity-100 hover:bg-white/5'}`}
-                >
-                  <span className="truncate mr-4">{sys.short}</span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === i ? 'opacity-100' : 'opacity-0 -translate-x-2'}`} />
-                </div>
-              ))}
+            <div className="flex flex-col gap-0.5">
+              {groups.map(group => {
+                if (group.type === 'item') {
+                  return (
+                    <div
+                      key={group.id}
+                      onClick={(e) => { e.stopPropagation(); setActiveItemId(group.id); }}
+                      className={`cursor-pointer flex items-center justify-between p-4 text-sm font-medium rounded-xl border transition-all ${activeItemId === group.id ? 'bg-white/10 border-white/20 text-white shadow-lg' : 'bg-transparent border-transparent opacity-60 hover:opacity-100 hover:bg-white/5'}`}
+                    >
+                      <span className="truncate mr-4">{group.label}</span>
+                      <ChevronRight className={`w-4 h-4 transition-transform ${activeItemId === group.id ? 'opacity-100' : 'opacity-0 -translate-x-2'}`} />
+                    </div>
+                  );
+                }
+                const isOpen = expandedFolders.has(group.id);
+                const hasActiveChild = group.children.some((c: any) => c.id === activeItemId);
+                return (
+                  <div key={group.id}>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); toggleFolder(group.id); }}
+                      className={`cursor-pointer flex items-center justify-between p-4 text-sm font-medium rounded-xl border transition-all ${hasActiveChild ? 'border-white/10 text-white bg-white/5' : 'bg-transparent border-transparent opacity-60 hover:opacity-100 hover:bg-white/5'}`}
+                    >
+                      <span className="truncate mr-4">{group.label}</span>
+                      <ChevronRight className={`w-4 h-4 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-90 opacity-100' : 'opacity-50'}`} />
+                    </div>
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2, ease: 'easeInOut' }}
+                          className="overflow-hidden"
+                        >
+                          <div className="ml-4 mt-0.5 border-l border-white/10 pl-3 flex flex-col gap-0.5 pb-1">
+                            {group.children.length > 0 ? group.children.map((child: any) => (
+                              <div
+                                key={child.id}
+                                onClick={(e) => { e.stopPropagation(); setActiveItemId(child.id); }}
+                                className={`cursor-pointer flex items-center justify-between px-3 py-2.5 text-sm rounded-lg border transition-all ${activeItemId === child.id ? 'bg-white/10 border-white/20 text-white font-medium' : 'bg-transparent border-transparent opacity-60 hover:opacity-100 hover:bg-white/5'}`}
+                              >
+                                <span className="truncate">{child.label}</span>
+                                {activeItemId === child.id && <ChevronRight className="w-3 h-3 opacity-50 shrink-0" />}
+                              </div>
+                            )) : (
+                              <span className="px-3 py-2 text-[11px] text-white/30 italic">Coming soon</span>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
             </div>
           </aside>
-          
+
           {/* Main View */}
           <div className="md:col-span-8 bg-transparent min-h-[500px] h-auto lg:h-[650px] relative overflow-hidden" style={{ transform: "translateZ(30px)" }}>
             <AnimatePresence mode="wait">
-              <motion.div 
+              <motion.div
                 key={activeSystem.id}
                 initial={{ opacity: 0, scale: 0.98, filter: 'blur(4px)' }}
                 animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
@@ -714,12 +552,7 @@ const SystemViewer = () => {
                 <div className="flex flex-col sm:flex-row gap-6 mb-6">
                   {activeSystem.image && (
                     <div className="w-full sm:w-32 h-32 rounded-xl overflow-hidden border border-white/10 shadow-lg shrink-0 bg-white">
-                      <img
-                        src={activeSystem.image}
-                        alt={activeSystem.name}
-                        loading="lazy"
-                        className="w-full h-full object-cover object-center"
-                      />
+                      <img src={activeSystem.image} alt={activeSystem.name} loading="lazy" className="w-full h-full object-cover object-center" />
                     </div>
                   )}
                   <div className="flex-1">
@@ -731,19 +564,8 @@ const SystemViewer = () => {
                   {activeSystem.isAbout ? "" : <strong className="text-white/80 font-semibold block mb-2">{activeSystem.material}</strong>}{activeSystem.desc}
                 </p>
               </div>
-              
-              {!activeSystem.isAbout ? (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="liquid-glass p-6 rounded-2xl border border-white/5 bg-white/[0.02] flex flex-col justify-center">
-                     <div className="text-3xl font-bold mb-1 tracking-tight">{activeSystem.grade}</div>
-                     <div className="text-[10px] opacity-50 uppercase tracking-widest">{activeSystem.defense}</div>
-                  </div>
-                  <div className="liquid-glass p-6 rounded-2xl border border-white/5 bg-white/[0.02] flex flex-col justify-center">
-                     <div className="text-3xl font-bold mb-1 tracking-tight flex items-center gap-2">{activeSystem.air}</div>
-                     <div className="text-[10px] opacity-50 uppercase tracking-widest">{t('air_qual')}</div>
-                  </div>
-                </div>
-              ) : (
+
+              {activeSystem.isAbout ? (
                 <div className="liquid-glass p-6 rounded-2xl border border-white/5 bg-white/[0.02]">
                   <div className="text-[10px] opacity-40 uppercase tracking-widest mb-4">{t('legal_entity')}</div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm font-mono text-white/80">
@@ -753,7 +575,7 @@ const SystemViewer = () => {
                     <div className="flex flex-col gap-1"><span className="text-white/40 uppercase text-[10px]">{t('address')}</span><span>ul. Rejtana 6/1<br/>87-100 Toruń</span></div>
                   </div>
                 </div>
-              )}
+              ) : null}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -762,6 +584,8 @@ const SystemViewer = () => {
     </section>
   );
 };
+
+
 
 const SecurityClassSlider = ({ classes, activeColor }: { classes: any[], activeColor: string }) => {
   const [active, setActive] = useState(0);
@@ -831,34 +655,34 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
   });
 
   const imageClasses = 
-    idx === 0 ? "w-full lg:w-5/12 h-[260px] sm:h-[320px] md:h-[380px] lg:h-[700px] rounded-[2rem]" :
-    idx === 1 ? "w-full lg:w-7/12 h-[240px] sm:h-[300px] md:h-[360px] lg:h-[500px] rounded-[3rem]" :
-    "w-full lg:w-1/2 h-[240px] sm:h-[300px] md:h-[360px] lg:h-auto lg:min-h-[600px] lg:aspect-video rounded-[1.5rem]";
+    idx === 0 ? "w-full order-1 lg:order-none lg:w-5/12 h-[38dvh] sm:h-[200px] md:h-[280px] lg:h-[520px] rounded-[1.5rem] lg:rounded-[2rem]" :
+    idx === 1 ? "w-full order-1 lg:order-none lg:w-7/12 h-[38dvh] sm:h-[180px] md:h-[260px] lg:h-[400px] rounded-[1.5rem] lg:rounded-[3rem]" :
+    "w-full order-1 lg:order-none lg:w-1/2 h-[38dvh] sm:h-[180px] md:h-[260px] lg:h-auto lg:min-h-[460px] lg:aspect-video rounded-[1.5rem]";
 
   return (
     <div id={`section-${section.id}`} className="w-full relative border-t border-white/5 scroll-mt-20">
       {/* Sticky section */}
       <div ref={containerRef} className="relative w-full" style={{ height: `${section.steps.length * 100}vh` }}>
         <div className="sticky top-0 w-full h-[100dvh] flex flex-col justify-center overflow-hidden">
-          <div className="max-w-[70rem] mx-auto w-full px-6 lg:px-[50px] relative z-10 py-4 md:py-8 lg:py-12">
+          <div className="max-w-[70rem] mx-auto w-full px-4 sm:px-6 lg:px-[50px] relative z-10 py-3 sm:py-4 md:py-8 lg:py-12">
             
             {/* Header & Image Layout */}
-            <div className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-4 md:gap-6 lg:gap-20 items-center`}>
+            <div className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-2 sm:gap-4 md:gap-6 lg:gap-20 items-center`}>
               
               {/* TEXT SIDE */}
-              <div className="flex-1 w-full flex flex-col items-start z-10">
+              <div className="flex-1 w-full flex flex-col items-start z-10 order-2 lg:order-none">
                 <div 
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-4 lg:mb-8 uppercase tracking-widest text-[10px] font-bold shadow-lg bg-black/40 backdrop-blur-md"
+                  className="inline-flex items-center gap-2 px-3 py-1 lg:px-4 lg:py-2 rounded-full border mb-2 lg:mb-8 uppercase tracking-widest text-[9px] lg:text-[10px] font-bold shadow-lg bg-black/40 backdrop-blur-md"
                   style={{ borderColor: `${section.color}40`, color: section.color }}
                 >
                   Series {section.id} &mdash; {section.tagline}
                 </div>
                 
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[4.5rem] xl:text-[5rem] font-black tracking-tighter uppercase leading-[1.05] mb-4 lg:mb-6">
+                <h2 className="text-lg sm:text-2xl md:text-4xl lg:text-[4.5rem] xl:text-[5rem] font-black tracking-tighter uppercase leading-[1.05] mb-1 sm:mb-2 lg:mb-6">
                   {section.title}
                 </h2>
                 
-                <div className="min-h-[200px] h-auto lg:h-[340px] relative w-full mb-6">
+                <div className="relative w-full mb-1 lg:mb-6">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeStep}
@@ -866,45 +690,18 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
-                      className="relative lg:absolute lg:inset-0 flex flex-col"
+                      className="relative flex flex-col"
                     >
-                      <h3 className="text-2xl font-bold mb-3" style={{ color: section.color }}>
+                      <h3 className="text-base sm:text-xl lg:text-2xl font-bold mb-1 lg:mb-3" style={{ color: section.color }}>
                         {section.steps[activeStep].subtitle}
                       </h3>
-                      <p className="text-lg text-white/60 font-medium leading-relaxed max-w-xl mb-6">
+                      <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/60 font-medium leading-relaxed max-w-xl mb-2 lg:mb-6 whitespace-pre-line">
                         {section.steps[activeStep].desc}
                       </p>
-                      
-                      {/* Technical Specs Grid per step */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 w-full">
-                        {section.steps[activeStep].specs.map((spec: any, i: number) => (
-                          <GlassSurface key={i} borderRadius={12} className="bg-[#ffffff0a] border border-white/20 relative group shadow-lg w-full h-full" contentClassName="flex flex-col p-2.5 sm:p-3 justify-center">
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div className="opacity-40 mb-1.5 sm:mb-2 relative z-10" style={{ color: section.color }}>{spec.icon}</div>
-                            <div className="text-[9px] sm:text-[10px] uppercase tracking-tight font-bold opacity-50 mb-0.5 relative z-10 line-clamp-2 break-words">{spec.label}</div>
-                            <div className="text-[11px] sm:text-sm font-bold tracking-tight relative z-10 leading-tight break-words line-clamp-2">{spec.value}</div>
-                          </GlassSurface>
-                        ))}
-                      </div>
                     </motion.div>
                   </AnimatePresence>
                 </div>
 
-                <div className="flex items-center gap-4 mt-3 lg:mt-6">
-                  <button
-                    onClick={() => {
-                      const nextIds = ['section-A-features', 'section-B-features', 'section-about'];
-                      const el = document.getElementById(nextIds[idx] ?? 'section-about');
-                      if (el) {
-                        const y = el.getBoundingClientRect().top + window.scrollY - 250;
-                        window.scrollTo({ top: y, behavior: 'smooth' });
-                      }
-                    }}
-                    className="cursor-pointer inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold uppercase tracking-widest"
-                  >
-                    {t('learn_more')} <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
 
               </div>
 
@@ -941,11 +738,35 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
                   ))}
                 </div>
 
-                <div className="absolute top-6 right-6 p-4 rounded-2xl bg-[#0c0c0c]/80 backdrop-blur-md border border-white/10 z-20 shadow-2xl">
+                <div className="absolute top-3 right-3 lg:top-6 lg:right-6 p-2 lg:p-4 rounded-xl lg:rounded-2xl bg-[#0c0c0c]/80 backdrop-blur-md border border-white/10 z-20 shadow-2xl">
                   {section.icon}
                 </div>
               </TiltCard>
             </div>
+
+            {/* Specs row — full width, single line, below text+image */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeStep}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-stretch gap-2 mt-2 md:mt-4 lg:mt-6 w-full"
+              >
+                {section.steps[activeStep].specs.map((spec: any, i: number) => (
+                  <GlassSurface key={i} borderRadius={10} className="bg-[#ffffff0a] border border-white/20 relative group shadow-lg flex-1 min-w-0 min-h-[64px] sm:min-h-[72px]" contentClassName="flex flex-row items-center h-full gap-1.5 sm:gap-3 px-2 sm:px-4 py-2 sm:py-3">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+                    <div className="opacity-40 shrink-0 relative z-10 hidden sm:block" style={{ color: section.color }}>{spec.icon}</div>
+                    <div className="flex flex-col min-w-0 relative z-10">
+                      <div className="text-[8px] sm:text-[9px] uppercase tracking-tight font-bold opacity-50 truncate">{spec.label}</div>
+                      <div className="text-[9px] sm:text-xs font-bold tracking-tight leading-tight break-words">{spec.value}</div>
+                      {spec.subValue && <div className="text-[8px] sm:text-[9px] font-mono opacity-50 break-all leading-tight">{spec.subValue}</div>}
+                    </div>
+                  </GlassSurface>
+                ))}
+              </motion.div>
+            </AnimatePresence>
 
           </div>
         </div>
@@ -963,10 +784,10 @@ const StickyScrollSection = ({ section, idx }: { section: any, idx: number, key?
 
         <div className="max-w-[80rem] px-6 lg:px-[50px] mx-auto w-full relative z-10">
             <motion.div 
-              initial={{ opacity: 0, y: 50, filter: 'blur(8px)' }}
+              initial={{ opacity: 0, y: 20, filter: 'blur(3px)' }}
               whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
               className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-8 lg:gap-16 w-full items-start`}
             >
               
@@ -1011,12 +832,13 @@ const MaterialSeries = () => {
         {
           subtitle: t('step_a1_s'),
           desc: t('step_a1_d'),
+          desc2: t('step_a1_d2'),
           image: "/images/series-a-1.webp",
           specs: [
-            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_p2050') },
-            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_u1u2') },
-            { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t45') },
-            { icon: <Thermometer className="w-4 h-4"/>, label: t('spec_hvac'), value: t('val_pass') },
+            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_p14') },
+            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_u1u3') },
+            { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_mass_a1'), subValue: t('val_mass_a1_dims') },
+            { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_dur12') },
           ]
         },
         {
@@ -1024,10 +846,10 @@ const MaterialSeries = () => {
           desc: t('step_a2_d'),
           image: "/images/series-a-2.webp",
           specs: [
-            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_p412') },
-            { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_h48') },
-            { icon: <Layers className="w-4 h-4"/>, label: t('spec_depth'), value: t('val_d48') },
-            { icon: <Thermometer className="w-4 h-4"/>, label: t('spec_hvac'), value: t('val_act') },
+            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_p4') },
+            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_u1s1') },
+            { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_mass_a1'), subValue: t('val_mass_a1_dims') },
+            { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_dur48p') },
           ]
         },
         {
@@ -1035,10 +857,10 @@ const MaterialSeries = () => {
           desc: t('step_a3_d'),
           image: "/images/series-a-3.webp",
           specs: [
-            { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t100') },
-            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_s3') },
-            { icon: <Building className="w-4 h-4"/>, label: t('spec_walls'), value: t('val_w600') },
-            { icon: <Crosshair className="w-4 h-4"/>, label: t('spec_blast'), value: t('val_b300') },
+            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_p70p') },
+            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_u1s3') },
+            { icon: <Building className="w-4 h-4"/>, label: t('spec_installation'), value: t('val_inst') },
+            { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_dur48p') },
           ]
         }
       ],
@@ -1048,9 +870,9 @@ const MaterialSeries = () => {
         { title: t('feat_a3_t'), desc: t('feat_a3_d') }
       ],
       classes: [
-        { id: "S1-S3", name: "S1-S3 Underground", desc: t('class_a_s1') },
         { id: "U1", name: "U1 Surface", desc: t('class_a_u1') },
-        { id: "U2-U3", name: "U2/U3 Surface+", desc: t('class_a_u2') }
+        { id: "U2-U3", name: "U2/U3 Surface+", desc: t('class_a_u2') },
+        { id: "S1-S3", name: "S1-S3 Underground", desc: t('class_a_s1') }
       ]
     },
     {
@@ -1066,10 +888,10 @@ const MaterialSeries = () => {
           desc: t('step_b1_d'),
           image: "/images/series-b-1.webp",
           specs: [
-            { icon: <Clock className="w-4 h-4"/>, label: t('spec_asm'), value: t('val_w12') },
-            { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t15') },
-            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_core'), value: t('val_c30') },
-            { icon: <Layers className="w-4 h-4"/>, label: t('spec_arch'), value: t('val_ilock') }
+            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_b1_cap') },
+            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_b1_rat') },
+            { icon: <Ruler className="w-4 h-4"/>, label: t('spec_dim'), value: t('val_b1_dims') },
+            { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_b1_dur') }
           ]
         },
         {
@@ -1077,10 +899,10 @@ const MaterialSeries = () => {
           desc: t('step_b2_d'),
           image: "/images/series-b-2.webp",
           specs: [
-            { icon: <Clock className="w-4 h-4"/>, label: t('spec_asm'), value: t('val_h4872') },
-            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_defl'), value: t('val_d150') },
-            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_p515') },
-            { icon: <Thermometer className="w-4 h-4"/>, label: t('spec_hvac'), value: t('val_dmode') }
+            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_b2_cap') },
+            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_b2_rat') },
+            { icon: <Layers className="w-4 h-4"/>, label: t('spec_walls'), value: t('val_b2_dims') },
+            { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_b2_dur') }
           ]
         },
         {
@@ -1088,10 +910,10 @@ const MaterialSeries = () => {
           desc: t('step_b3_d'),
           image: "/images/series-b-3.webp",
           specs: [
-            { icon: <Crosshair className="w-4 h-4"/>, label: t('spec_mob'), value: t('val_mhigh') },
-            { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t10') },
-            { icon: <Layers className="w-4 h-4"/>, label: t('spec_walls'), value: t('val_sarm') },
-            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_l1') }
+            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_b3_cap') },
+            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_b3_rat') },
+            { icon: <Crosshair className="w-4 h-4"/>, label: t('spec_mob'), value: t('val_b3_mob') },
+            { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_b3_dur') }
           ]
         }
       ],
@@ -1101,14 +923,14 @@ const MaterialSeries = () => {
         { title: t('feat_b3_t'), desc: t('feat_b3_d') }
       ],
       classes: [
-        { id: "L3", name: "Level 3 Modular", desc: t('class_b_l3') },
-        { id: "L2", name: "Level 2 Tactical", desc: t('class_b_l2') },
-        { id: "L1", name: "Level 1 Rapid", desc: t('class_b_l1') }
+        { id: "MDS", name: "MDS", desc: t('class_b_l1') },
+        { id: "U1-U3", name: "U1-U3", desc: t('class_b_l2') },
+        { id: "S1", name: "S1", desc: t('class_b_l3') }
       ]
     },
     {
       id: "C",
-      title: "Cylindrical Systems",
+      title: "Polymer Underground Pipes",
       bgText: "PIPES",
       tagline: "Urban / Infrastructure",
       color: "#FF4D00",
@@ -1119,10 +941,10 @@ const MaterialSeries = () => {
           desc: t('step_c1_d'),
           image: "/images/series-c-1.webp",
           specs: [
-            { icon: <Crosshair className="w-4 h-4"/>, label: t('spec_res'), value: t('val_r60') },
-            { icon: <Zap className="w-4 h-4"/>, label: t('spec_pow'), value: t('val_sol') },
-            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_s1025') },
-            { icon: <Layers className="w-4 h-4"/>, label: t('spec_fire'), value: t('val_rei120') }
+            { icon: <Users className="w-4 h-4"/>, label: t('spec_cap'), value: t('val_c1_cap') },
+            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_rat'), value: t('val_c1_rat') },
+            { icon: <Building className="w-4 h-4"/>, label: t('spec_installation'), value: t('val_c1_inst') },
+            { icon: <Clock className="w-4 h-4"/>, label: t('spec_dur'), value: t('val_c1_dur') }
           ]
         },
         {
@@ -1130,10 +952,10 @@ const MaterialSeries = () => {
           desc: t('step_c2_d'),
           image: "/images/series-c-2.webp",
           specs: [
-            { icon: <Ruler className="w-4 h-4"/>, label: t('spec_dim'), value: t('val_dim') },
-            { icon: <Weight className="w-4 h-4"/>, label: t('spec_mass'), value: t('val_t90') },
-            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_owall'), value: t('val_w380') },
-            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_icore'), value: t('val_m4') }
+            { icon: <Ruler className="w-4 h-4"/>, label: t('spec_dim'), value: t('val_c2_diam') },
+            { icon: <Building className="w-4 h-4"/>, label: t('spec_depth'), value: t('val_c2_len') },
+            { icon: <Layers className="w-4 h-4"/>, label: t('spec_arch'), value: t('val_c2_sys') },
+            { icon: <ShieldAlert className="w-4 h-4"/>, label: t('spec_blast'), value: t('val_c2_exit') }
           ]
         }
       ],
@@ -1143,9 +965,8 @@ const MaterialSeries = () => {
         { title: t('feat_c3_t'), desc: t('feat_c3_d') }
       ],
       classes: [
-        { id: "U3", name: "U3 High Protection", desc: t('class_c_u3_d') },
         { id: "U1-U2", name: "U1/U2 Basic", desc: t('class_c_u12_d') },
-        { id: "AUX", name: "Auxiliary Ops", desc: t('class_c_aux_d') }
+        { id: "U3", name: "U3 High Protection", desc: t('class_c_u3_d') }
       ]
     }
   ];
@@ -1257,14 +1078,14 @@ const Validation = () => {
                <div className="text-[10px] opacity-60 uppercase tracking-widest font-bold">{t('shock')}</div>
              </div>
              <div className="liquid-glass flex-1 rounded-3xl p-8 border border-white/10 flex flex-col justify-center min-h-[120px]">
-               <div className="text-4xl lg:text-5xl font-black mb-2 tracking-tighter">&lt;0.1mm</div>
-               <div className="text-[10px] opacity-60 uppercase tracking-widest font-bold">{t('struct')}</div>
+               <div className="text-4xl lg:text-5xl font-black mb-2 tracking-tighter">360mm</div>
+               <div className="text-[10px] opacity-60 uppercase tracking-widest font-bold">{t('conc_thick')}</div>
              </div>
              <div className="liquid-glass flex-1 rounded-3xl p-8 border border-brand/20 flex flex-col justify-center bg-brand/5 min-h-[120px]">
                <div className="text-3xl lg:text-4xl font-black mb-2 tracking-tighter flex items-center gap-3">
-                 ISO-9001 <CheckCircle2 className="w-7 h-7 text-brand"/>
+                 {t('cert_val')} <CheckCircle2 className="w-7 h-7 text-brand"/>
                </div>
-               <div className="text-[10px] opacity-60 uppercase tracking-widest font-bold text-brand">{t('mfg_comp')}</div>
+               <div className="text-[10px] opacity-60 uppercase tracking-widest font-bold text-brand">{t('cert_in_eu')}</div>
              </div>
            </div>
          </div>
@@ -1318,6 +1139,191 @@ const Validation = () => {
         )}
       </AnimatePresence>
     </section>
+  );
+};
+
+// ── Contact Form ─────────────────────────────────────────────────────────────
+// Standalone component so it can reset its own state when the modal closes.
+
+interface ContactFormState {
+  name:    string;
+  email:   string;
+  subject: string;
+  message: string;
+  // Honeypot: must stay empty — bots auto-fill hidden fields.
+  // Server checks this field; if filled it silently drops the submission.
+  _hp:     string;
+}
+
+type FormStatus = 'idle' | 'loading' | 'success' | 'error';
+
+const ContactForm = ({ onClose }: { onClose: () => void }) => {
+  const [fields, setFields] = useState<ContactFormState>({
+    name: '', email: '', subject: '', message: '', _hp: '',
+  });
+  const [status,   setStatus]   = useState<FormStatus>('idle');
+  const [errorMsg, setErrorMsg] = useState<string>('');
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFields(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    // ── Client-side validation ──────────────────────────────────────────────
+    const { name, email, subject, message } = fields;
+    if (!name.trim())                        { setErrorMsg(t('form_error')); return; }
+    if (name.trim().length > 100)            { setErrorMsg('Name: max 100 characters.'); return; }
+    if (!email.trim())                       { setErrorMsg(t('form_error')); return; }
+    if (!EMAIL_RE.test(email.trim()))        { setErrorMsg('Please enter a valid email address.'); return; }
+    if (email.trim().length > 150)           { setErrorMsg('Email: max 150 characters.'); return; }
+    if (!subject.trim())                     { setErrorMsg(t('form_error')); return; }
+    if (subject.trim().length > 150)         { setErrorMsg('Subject: max 150 characters.'); return; }
+    if (!message.trim())                     { setErrorMsg(t('form_error')); return; }
+    if (message.trim().length > 5000)        { setErrorMsg('Message: max 5000 characters.'); return; }
+
+    setStatus('loading');
+
+    try {
+      const res = await fetch('/api/contact', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(fields),
+      });
+
+      const data: { ok: boolean; message?: string } = await res.json();
+
+      if (res.ok && data.ok) {
+        setStatus('success');
+        // Auto-close modal after 3 s on success
+        setTimeout(onClose, 3000);
+      } else {
+        setStatus('error');
+        setErrorMsg(data.message ?? t('form_error'));
+      }
+    } catch {
+      setStatus('error');
+      setErrorMsg(t('form_error'));
+    }
+  };
+
+  const isLoading = status === 'loading';
+
+  return (
+    <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
+      <div className="shrink-0"><h3 className="text-2xl md:text-3xl font-black text-[#0c0c0c] tracking-tight">{t('contact')}</h3></div>
+
+      {/* Success state */}
+      {status === 'success' ? (
+        <div className="flex-1 flex items-center gap-3 py-3">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+          <p className="text-sm font-semibold text-emerald-700">{t('form_success')}</p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} noValidate className="flex-1 w-full flex flex-col gap-4">
+          {/* Honeypot — visually hidden, never filled by real users */}
+          <input
+            type="text"
+            name="_hp"
+            value={fields._hp}
+            onChange={handleChange}
+            aria-hidden="true"
+            tabIndex={-1}
+            autoComplete="off"
+            style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
+          />
+
+          <div className="flex flex-col md:flex-row">
+            <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10">
+              <label htmlFor="cf-name" className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_name')}</label>
+              <input
+                id="cf-name"
+                type="text"
+                name="name"
+                value={fields.name}
+                onChange={handleChange}
+                placeholder="Type..."
+                required
+                maxLength={100}
+                disabled={isLoading}
+                autoComplete="name"
+                className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1 disabled:opacity-50"
+              />
+            </div>
+            <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10">
+              <label htmlFor="cf-email" className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_email')}</label>
+              <input
+                id="cf-email"
+                type="email"
+                name="email"
+                value={fields.email}
+                onChange={handleChange}
+                placeholder="Email..."
+                required
+                maxLength={150}
+                disabled={isLoading}
+                autoComplete="email"
+                className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1 disabled:opacity-50"
+              />
+            </div>
+            <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10">
+              <label htmlFor="cf-subject" className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_subject')}</label>
+              <input
+                id="cf-subject"
+                type="text"
+                name="subject"
+                value={fields.subject}
+                onChange={handleChange}
+                placeholder="Inquiry type..."
+                required
+                maxLength={150}
+                disabled={isLoading}
+                className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1 disabled:opacity-50"
+              />
+            </div>
+            <div className="flex-1 px-0 md:px-4 py-2 md:py-0">
+              <label htmlFor="cf-message" className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_msg')}</label>
+              <input
+                id="cf-message"
+                type="text"
+                name="message"
+                value={fields.message}
+                onChange={handleChange}
+                placeholder="Your inquiry..."
+                required
+                maxLength={5000}
+                disabled={isLoading}
+                className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1 disabled:opacity-50"
+              />
+            </div>
+          </div>
+
+          {/* Error banner */}
+          {status === 'error' && errorMsg && (
+            <p className="text-xs font-semibold text-red-600 mt-1">{errorMsg}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="shrink-0 w-full md:w-auto md:self-end h-12 px-6 md:px-4 rounded-full bg-[#0c0c0c] text-white flex items-center justify-center gap-2 hover:bg-[#1a1a1a] transition-colors shadow-lg cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <span className="text-xs font-bold tracking-widest uppercase">{t('form_sending')}</span>
+            ) : (
+              <ChevronRight className="w-5 h-5" />
+            )}
+          </button>
+        </form>
+      )}
+    </div>
   );
 };
 
@@ -1472,10 +1478,15 @@ export default function App() {
     return () => window.removeEventListener('openContact', handleOpen);
   }, []);
 
-  useMotionValueEvent(appScrollY, 'change', (latest) => {
-    const previous = appScrollY.getPrevious() ?? 0;
-    if (Math.abs(latest - previous) > 5) setShowContact(false);
-  });
+  // Lock body scroll when contact popup is open
+  useEffect(() => {
+    if (showContact) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [showContact]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1488,13 +1499,13 @@ export default function App() {
     if (isLoading) return;
     // Initialize Lenis for global smooth scroll inertia
     const lenis = new Lenis({
-      duration: 1.5,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // standard smooth easing
+      duration: 2.4,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1.2,
-      touchMultiplier: 2,
+      wheelMultiplier: 0.8,
+      touchMultiplier: 1.5,
     });
 
     let rafId: number;
@@ -1617,19 +1628,7 @@ export default function App() {
                 <button onClick={() => setShowContact(false)} className="absolute -top-4 -right-4 md:-top-5 md:-right-5 z-[100] w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0c0c0c] text-white flex items-center justify-center shadow-2xl hover:bg-[#1a1a1a] transition-colors border border-white/10 hover:scale-105 cursor-pointer">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 1L13 13M1 13L13 1"/></svg>
                 </button>
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
-                  <div className="shrink-0"><h3 className="text-2xl md:text-3xl font-black text-[#0c0c0c] tracking-tight">{t('contact')}</h3></div>
-                  <form onSubmit={(e) => { e.preventDefault(); setShowContact(false); }} className="flex-1 w-full flex flex-col md:flex-row items-stretch gap-4 md:gap-0">
-                    <div className="flex-1 flex flex-col md:flex-row">
-                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10"><label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_name')}</label><input type="text" placeholder="Type..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" /></div>
-                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10"><label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_email')}</label><input type="email" placeholder="Email..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" /></div>
-                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0 border-b md:border-b-0 md:border-r border-[#0c0c0c]/10"><label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_org')}</label><input type="text" placeholder="Company..." className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" /></div>
-                      <div className="flex-1 px-0 md:px-4 py-2 md:py-0"><label className="text-[10px] font-bold tracking-widest uppercase text-[#0c0c0c]/40 block mb-1">{t('form_msg')}</label><input type="text" placeholder="Your inquiry..." required className="w-full bg-transparent text-[#0c0c0c] text-sm font-medium placeholder:text-[#0c0c0c]/30 focus:outline-none py-1" /></div>
-                    </div>
-                    <button type="submit" className="shrink-0 w-full md:w-12 h-12 rounded-full bg-[#0c0c0c] text-white flex items-center justify-center hover:bg-[#1a1a1a] transition-colors shadow-lg md:ml-4 mt-3 md:mt-0 cursor-pointer"><ChevronRight className="w-5 h-5" /></button>
-                  </form>
-                </div>
-                <div className="mt-5 flex items-center gap-2 text-[10px] text-[#0c0c0c]/30 font-medium uppercase tracking-widest"><div className="w-3 h-3 rounded-full border border-[#0c0c0c]/20" />By submitting, you agree to our privacy policy</div>
+                <ContactForm onClose={() => setShowContact(false)} />
               </div>
             </motion.div>
           </>
