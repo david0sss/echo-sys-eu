@@ -9,3 +9,6 @@ coverage/
 
 # Dev-only tooling — entire directory excluded from production tracking
 dev-tools/
+
+# Large video assets — served via CDN/Google Drive, too large for GitHub (>100 MB)
+public/intro.mp4

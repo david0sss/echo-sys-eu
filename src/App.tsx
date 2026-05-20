@@ -6,6 +6,7 @@
 import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { setLanguage, useLanguage, t } from "./translations";
 import LogoLoop from "./components/LogoLoop";
+import IntroScreen from "./components/IntroScreen";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence, useMotionValue, useTransform, useSpring } from "motion/react";
 const LazyGlobe = lazy(() => import("./components/ui/globe").then(m => ({ default: m.Globe })));
 import ColorBends from "./components/ui/ColorBends";
@@ -1518,13 +1519,6 @@ export default function App() {
   }, [showContact]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1800);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
     if (isLoading) return;
     // Initialize Lenis for global smooth scroll inertia
     const lenis = new Lenis({
@@ -1556,40 +1550,10 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-[#0c0c0c] text-white font-sans flex flex-col">
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div 
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed inset-0 z-[999] bg-[#0c0c0c] flex flex-col items-center justify-center"
-          >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 4, ease: "linear", repeat: Infinity }}
-              className="mb-8 opacity-80"
-            >
-              <LogoMark className="w-12 h-12 text-white" />
-            </motion.div>
-            <motion.div 
-              className="h-px bg-white/20 w-48 overflow-hidden"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 1.5, ease: "circInOut" }}
-            >
-              <motion.div 
-                className="h-full bg-white/80 w-full"
-                initial={{ x: "-100%" }}
-                animate={{ x: "100%" }}
-                transition={{ duration: 1, ease: "linear", repeat: Infinity }}
-              />
-            </motion.div>
-            <div className="text-[10px] font-mono tracking-[0.3em] uppercase text-white/40 mt-6">
-              Initializing Core Systems
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Video intro screen — replaces old spinner loader */}
+      {isLoading && (
+        <IntroScreen onDone={() => setIsLoading(false)} />
+      )}
 
       <div className="noise-bg z-10 pointer-events-none mix-blend-overlay opacity-30" style={{ willChange: 'transform', contain: 'strict' }}></div>
       
